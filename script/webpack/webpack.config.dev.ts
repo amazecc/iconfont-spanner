@@ -17,12 +17,12 @@ const config: Configuration = merge(common, {
         open: true,
         historyApiFallback: true,
         proxy: [
-            // {
-            //     context: ["/v1"],
-            //     target: "https://test-api.s-light.top",
-            //     secure: true,
-            //     changeOrigin: true,
-            // },
+            {
+                context: ["/api"],
+                target: "http://localhost:3000",
+                secure: true,
+                changeOrigin: true,
+            },
         ],
     },
     module: {

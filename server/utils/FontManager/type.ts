@@ -32,6 +32,8 @@ export interface SvgFileMetadata {
     fileName: string;
     /** svg react 组件名称 */
     svgReactComponentName: string;
+	/** svg 优化后的字符 */
+	svgOptimizeString: string;
     /** 字体 unicode 16 进制码点值 */
     unicodeHex: number;
     /** 是否使用 currentColor 填充 */

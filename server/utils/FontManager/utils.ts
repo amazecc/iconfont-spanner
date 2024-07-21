@@ -166,6 +166,11 @@ export const optimizeSvgString = (svg: string, fillCurrentColor: boolean) => {
         plugins: [
             {
                 name: "preset-default",
+                params: {
+                    overrides: {
+                        removeViewBox: false,
+                    },
+                },
             },
             {
                 name: "modifySvgSizeAndColor",

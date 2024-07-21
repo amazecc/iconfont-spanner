@@ -30,7 +30,8 @@
         "exactOptionalPropertyTypes": false,
         "baseUrl": ".",
         "paths": {
-            "src/*": ["src/*"]
+            "src/*": ["src/*"],
+            "server/*": ["server/*"]
         }
     },
     "include": ["src", "script", "server"],

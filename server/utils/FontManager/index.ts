@@ -89,9 +89,7 @@ export class FontManager {
     private async generateSvgReactComponent(option: SvgReactComponentOption) {
         await fs.ensureDir(this.getOutputPath({ dir: option.dir }));
         this.svgFileMetadata.forEach(item => {
-            const svg = fs.readFileSync(item.path, "utf-8");
-            const data = optimizeSvgString(svg, item.fillCurrentColor);
-            fs.writeFile(this.getOutputPath({ dir: option.dir, name: item.svgReactComponentName, ext: "tsx" }), option.content(item.svgReactComponentName, data));
+            fs.writeFile(this.getOutputPath({ dir: option.dir, name: item.svgReactComponentName, ext: "tsx" }), option.content(item.svgReactComponentName, item.svgOptimizeString));
         });
     }
 
@@ -120,6 +118,9 @@ export class FontManager {
             if (isFile) {
                 if (filePath && path.extname(filePath) === ".svg") {
                     const fileFullName = path.basename(filePath);
+                    const fillCurrentColor = !fileFullName.endsWith("_oc.svg");
+                    const svg = fs.readFileSync(filePath, "utf-8");
+                    const svgOptimizeString = optimizeSvgString(svg, fillCurrentColor);
                     this.svgFileMetadata.push({
                         path: filePath,
                         fileFullName,
@@ -127,7 +128,8 @@ export class FontManager {
                         svgReactComponentName: toBigCamelCase(fileFullName.replace("oc", "OC")),
                         // eslint-disable-next-line no-plusplus
                         unicodeHex: ++initialUnicodeHex,
-                        fillCurrentColor: !fileFullName.endsWith("_oc.svg"),
+                        svgOptimizeString,
+                        fillCurrentColor,
                     });
                 }
             }
