@@ -8,9 +8,18 @@ const router = new Router();
 router.get("/api/list", async ctx => {
     const config = await importConfig();
     const fontManager = new FontManager(config);
+    fontManager.read();
     ctx.body = {
         success: true,
-        data: fontManager.read(),
+        data: {
+            font: fontManager.option.output.fontName
+                ? {
+                      fontName: fontManager.option.output.fontName,
+                      fontMetadata: fontManager.fontMetadata,
+                  }
+                : undefined,
+            component: fontManager.option.output.component && fontManager.svgComponentMetadata,
+        },
     };
 });
 

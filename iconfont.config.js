@@ -1,5 +1,5 @@
 import path from "path";
-import { getSvgTSReactComponentContent } from "./server/utils/FontManager/utils";
+import { getSvgTSReactComponentContent, toBigCamelCase } from "./server/utils/FontManager/utils";
 
 /** @type {import('./server/utils/FontManager/type').FontManagerOption} */
 export default {
@@ -7,10 +7,12 @@ export default {
     output: {
         dir: path.join(process.cwd(), "src/font"),
         fontName: "iconfont",
-        svgComponent: {
-            type: "react",
+        component: {
             dir: "react-components",
+            fileName: fileName => `${toBigCamelCase(fileName.replace(/_oc$/, "_OC"))}.tsx`,
+            name: fileName => toBigCamelCase(fileName.replace(/_oc$/, "_OC")),
             content: getSvgTSReactComponentContent,
+            fillCurrentColor: fileName => !fileName.endsWith("_oc"),
         },
     },
 };

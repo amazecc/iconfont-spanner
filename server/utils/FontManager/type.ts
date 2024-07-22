@@ -8,36 +8,50 @@ export interface FontManagerOption {
         /** 字体名称 */
         fontName?: string;
         /** svg 组件生成配置 */
-        svgComponent?: SvgReactComponentOption;
+        component?: ComponentOption;
     };
 }
 
-export interface SvgReactComponentOption {
-    /** 生成 react 组件 */
-    type: "react";
+export interface ComponentOption {
     /** 组件放置的文件夹, 相对于 output.dir 的相对路径 */
     dir: string;
-    /** 生成组件代码 */
-    content: (componentName: string, svgString: string) => string;
+    /** 组件文件名，需要带上后缀，比如：Demo.tsx */
+    fileName: (fileName: string) => string;
+    /** 组件名 */
+    name: (fileName: string) => string;
+    /** 组件代码 */
+    content: (name: string, svgString: string, fileName: string) => string;
+    /**
+     * 是否使用 currentColor 填充颜色，这将继承 fontColor
+     * @default true
+     */
+    fillCurrentColor?: boolean | ((fileName: string) => boolean);
 }
 
 // *********************************************************************************************************
 
-export interface SvgFileMetadata {
+/** 需要生成 svg 组件的信息 */
+export interface SvgComponentMetadata {
     /** svg 文件绝对原始值 */
-    path: string;
-    /** svg 文件全称 */
-    fileFullName: string;
+    filePath: string;
     /** 文件名, 不包含后缀，该名称将作为图标类名 */
     fileName: string;
-    /** svg react 组件名称 */
-    svgReactComponentName: string;
-	/** svg 优化后的字符 */
-	svgOptimizeString: string;
-    /** 字体 unicode 16 进制码点值 */
-    unicodeHex: number;
+	/** 组件名称 */
+	name: string;
+    /** svg 优化后的字符 */
+    svgOptimizeString: string;
     /** 是否使用 currentColor 填充 */
     fillCurrentColor: boolean;
+}
+
+/** 需要生成字体的信息 */
+export interface FontMetadata {
+    /** svg 文件绝对原始值 */
+    filePath: string;
+    /** 文件名, 不包含后缀，该名称将作为图标类名 */
+    fileName: string;
+    /** 字体 unicode 16 进制码点值 */
+    unicodeHex: number;
 }
 
 // *********************************************************************************************************

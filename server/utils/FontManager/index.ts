@@ -4,15 +4,18 @@ import SVGIcons2SVGFontStream, { type Metadata } from "svgicons2svgfont";
 import svg2ttf from "svg2ttf";
 import ttf2woff2 from "ttf2woff2";
 import ttf2woff from "ttf2woff";
-import { walkFileSync, getTypeDeclarationString, getCssString, toBigCamelCase, optimizeSvgString, findDuplicates, getPreviewHtmlString } from "./utils";
-import type { FontManagerOption, OutputFile, SvgFileMetadata, SvgReactComponentOption } from "./type";
+import { walkFileSync, getTypeDeclarationString, getCssString, optimizeSvgString, findDuplicates } from "./utils";
+import type { FontManagerOption, OutputFile, FontMetadata, SvgComponentMetadata, ComponentOption } from "./type";
 
 export class FontManager {
     /** 构造函数配置项 */
-    private readonly option: FontManagerOption;
+    readonly option: FontManagerOption;
 
-    /** 文件列表信息 */
-    private readonly svgFileMetadata: SvgFileMetadata[] = [];
+    /** svg 组件信息 */
+    readonly svgComponentMetadata: SvgComponentMetadata[] = [];
+
+    /** 字体信息 */
+    readonly fontMetadata: FontMetadata[] = [];
 
     constructor(option: FontManagerOption) {
         this.option = option;
@@ -55,12 +58,12 @@ export class FontManager {
                 .pipe(fs.createWriteStream(this.getOutputPath({ ext: "svg" })))
                 .on("finish", resolve)
                 .on("error", reject);
-            this.svgFileMetadata.forEach(item => {
-                const glyph = fs.createReadStream(item.path) as fs.ReadStream & { metadata?: Metadata };
+            this.fontMetadata.forEach(item => {
+                const glyph = fs.createReadStream(item.filePath) as fs.ReadStream & { metadata?: Metadata };
                 glyph.metadata = {
                     unicode: [String.fromCharCode(item.unicodeHex)],
                     name: item.fileName,
-                    path: item.fileFullName,
+                    path: item.filePath,
                     renamed: false,
                 };
                 fontStream.write(glyph);
@@ -86,63 +89,71 @@ export class FontManager {
     /**
      * 生成 svg react 组件文件
      */
-    private async generateSvgReactComponent(option: SvgReactComponentOption) {
+    private async generateComponent(option: ComponentOption) {
         await fs.ensureDir(this.getOutputPath({ dir: option.dir }));
-        this.svgFileMetadata.forEach(item => {
-            fs.writeFile(this.getOutputPath({ dir: option.dir, name: item.svgReactComponentName, ext: "tsx" }), option.content(item.svgReactComponentName, item.svgOptimizeString));
+        this.svgComponentMetadata.forEach(item => {
+            const [fileName, ext] = option.fileName(item.fileName).split(".");
+            const name = option.name(item.fileName);
+            fs.writeFile(this.getOutputPath({ dir: option.dir, name: fileName, ext }), option.content(name, item.svgOptimizeString, item.fileName));
         });
     }
 
     /** 生成 typescript 类型声明 */
     private async generateTypeDeclaration() {
-        const typeDeclarationString = getTypeDeclarationString(this.getFontName(), this.svgFileMetadata);
+        const typeDeclarationString = getTypeDeclarationString(this.getFontName(), this.fontMetadata);
         fs.writeFileSync(this.getOutputPath({ ext: "ts" }), typeDeclarationString);
     }
 
     /** 生成 css 文件 */
     private async generateCss() {
-        const cssString = getCssString(this.getFontName(), this.svgFileMetadata);
+        const cssString = getCssString(this.getFontName(), this.fontMetadata);
         fs.writeFileSync(this.getOutputPath({ ext: "css" }), cssString);
-    }
-
-    /** 生成 html 预览文件 */
-    private async generatePreviewHtml() {
-        const htmlString = getPreviewHtmlString(this.getFontName(), this.svgFileMetadata);
-        fs.writeFileSync(this.getOutputPath({ name: "preview", ext: "html" }), htmlString);
     }
 
     /** 读取文件资源 */
     read() {
+        const { fontName, component } = this.option.output;
         let initialUnicodeHex = 0xe000;
         walkFileSync(this.option.resourceDir, (filePath, isFile) => {
             if (isFile) {
                 if (filePath && path.extname(filePath) === ".svg") {
-                    const fileFullName = path.basename(filePath);
-                    const fillCurrentColor = !fileFullName.endsWith("_oc.svg");
-                    const svg = fs.readFileSync(filePath, "utf-8");
-                    const svgOptimizeString = optimizeSvgString(svg, fillCurrentColor);
-                    this.svgFileMetadata.push({
-                        path: filePath,
-                        fileFullName,
-                        fileName: path.basename(filePath, ".svg"),
-                        svgReactComponentName: toBigCamelCase(fileFullName.replace("oc", "OC")),
-                        // eslint-disable-next-line no-plusplus
-                        unicodeHex: ++initialUnicodeHex,
-                        svgOptimizeString,
-                        fillCurrentColor,
-                    });
+                    const fileName = path.basename(filePath, ".svg");
+                    // 如果开启 font 生成
+                    if (fontName) {
+                        this.fontMetadata.push({
+                            filePath,
+                            fileName,
+                            // eslint-disable-next-line no-plusplus
+                            unicodeHex: ++initialUnicodeHex,
+                        });
+                    }
+                    // 如果开启 svg 组件生成
+                    if (component) {
+                        const fillCurrentColor = component.fillCurrentColor instanceof Function ? component.fillCurrentColor(fileName) : (component.fillCurrentColor ?? true);
+                        const svg = fs.readFileSync(filePath, "utf-8");
+                        const svgOptimizeString = optimizeSvgString(svg, fillCurrentColor);
+                        this.svgComponentMetadata.push({
+                            filePath,
+                            fileName,
+                            name: component.name(fileName),
+                            svgOptimizeString,
+                            fillCurrentColor,
+                        });
+                    }
                 }
             }
         });
-        const fileFullNames = this.svgFileMetadata.map(item => item.fileFullName);
-        const duplicatesFileFullNames = findDuplicates(fileFullNames);
-        if (duplicatesFileFullNames.length) {
-            const duplicatesFilePath = this.svgFileMetadata.filter(item => duplicatesFileFullNames.includes(item.fileFullName)).map(item => item.path);
-            console.log("【异常】文件名重复：\n");
-            console.log(duplicatesFilePath.join("\n"));
-            process.exit(1);
+        if (this.svgComponentMetadata.length || this.fontMetadata.length) {
+            const metadata = this.svgComponentMetadata || this.fontMetadata;
+            const fileNames = metadata.map(item => item.fileName);
+            const duplicatesFileNames = findDuplicates(fileNames);
+            if (duplicatesFileNames.length) {
+                const duplicatesFilePath = metadata.filter(item => duplicatesFileNames.includes(item.fileName)).map(item => item.filePath);
+                console.log("【异常】文件名重复：\n");
+                console.log(duplicatesFilePath.join("\n"));
+                process.exit(1);
+            }
         }
-        return this.svgFileMetadata;
     }
 
     /** 生成字体等资源文件 */
@@ -153,10 +164,9 @@ export class FontManager {
             await this.generateFontBySvgFont();
             await this.generateTypeDeclaration();
             await this.generateCss();
-            await this.generatePreviewHtml();
         }
-        if (this.option.output.svgComponent?.type === "react") {
-            await this.generateSvgReactComponent(this.option.output.svgComponent);
+        if (this.option.output.component) {
+            await this.generateComponent(this.option.output.component);
         }
     }
 }

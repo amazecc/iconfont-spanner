@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import { optimize } from "svgo";
-import type { SvgFileMetadata, SvgReactComponentOption } from "./type";
+import type { FontMetadata, ComponentOption } from "./type";
 
 // ********************************************** node 工具函数 ***********************************************
 
@@ -56,7 +56,7 @@ export const getUnicodeDisplayString = (unicodeHex: number, type: "css" | "html"
 // ********************************************** 模板文件生成工具函数 ***********************************************
 
 /** 生成 typescript 类型声明 */
-export const getTypeDeclarationString = (fontName: string, metadata: SvgFileMetadata[]) => {
+export const getTypeDeclarationString = (fontName: string, metadata: FontMetadata[]) => {
     return `
 /** 字体 ${fontName} 类名 */
 export type ${toBigCamelCase(fontName)}ClassName = ${metadata.map(font => `"${font.fileName}"`).join(" | ")};
@@ -69,7 +69,7 @@ export const ${toCamelCase(fontName)}HTMLUnicode = {
 };
 
 /** 生成 css 文件 */
-export const getCssString = (fontName: string, metadata: SvgFileMetadata[]) => {
+export const getCssString = (fontName: string, metadata: FontMetadata[]) => {
     const now = Date.now();
     return `
 @font-face {
@@ -94,65 +94,6 @@ ${metadata
 }`;
     })
     .join("\n")}
-`;
-};
-
-/** 获取预览html字符串 */
-export const getPreviewHtmlString = (fontName: string, metadata: SvgFileMetadata[]) => {
-    return `
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>${fontName} 预览</title>
-        <link rel="stylesheet" href="${fontName}.css" />
-        <style>
-            body {
-                width: 1024px;
-                margin: 0 auto;
-            }
-            .${fontName} {
-                font-size: 52px;
-            }
-
-            .grid {
-                display: grid;
-                grid-template-columns: repeat(8, 1fr);
-                grid-gap: 20px;
-            }
-            .grid > * {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                padding: 8px;
-                border-radius: 4px;
-				transition: all 0.1s;
-            }
-            .grid > *:hover {
-                background-color: aliceblue;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>${fontName} 预览</h1>
-        <div class="grid">
-			${metadata
-                .map(item => {
-                    return `
-			<div>
-				<span class="${fontName} ${item.fileName}"></span>
-				<span>${item.fileName}</span>
-				<span>&amp;#x${item.unicodeHex.toString(16)};</span>
-				<span>${item.svgReactComponentName}</span>
-			</div>
-					`;
-                })
-                .join("")}
-        </div>
-    </body>
-</html>	
 `;
 };
 
@@ -201,11 +142,11 @@ export const optimizeSvgString = (svg: string, fillCurrentColor: boolean) => {
 };
 
 /** 获取 typescript 版本的 svg react 组件内容 */
-export const getSvgTSReactComponentContent: SvgReactComponentOption["content"] = (componentName, svgString) => {
+export const getSvgTSReactComponentContent: ComponentOption["content"] = (name, svgString) => {
     return `
-export interface ${componentName}Props extends React.SVGAttributes<SVGSVGElement> {}
+export interface ${name}Props extends React.SVGAttributes<SVGSVGElement> {}
 
-export const ${componentName} = (props: ${componentName}Props) => {
+export const ${name} = (props: ${name}Props) => {
 	return (
 		${svgString.replace(/<svg.+?>/gm, item => `${item.slice(0, item.length - 1)} {...props}>`)}
 	)
@@ -214,9 +155,9 @@ export const ${componentName} = (props: ${componentName}Props) => {
 };
 
 /** 获取 javascript 版本的 svg react 组件内容 */
-export const getSvgJSReactComponentContent: SvgReactComponentOption["content"] = (componentName, svgString) => {
+export const getSvgJSReactComponentContent: ComponentOption["content"] = (name, svgString) => {
     return `
-export const ${componentName} = (props) => {
+export const ${name} = (props) => {
 	return (
 		${svgString.replace(/<svg.+?>/gm, item => `${item.slice(0, item.length - 1)} {...props}>`)}
 	)

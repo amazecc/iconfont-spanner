@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import type { SvgFileMetadata } from "server/utils/FontManager/type";
-import { IconCard } from "./components/IconCard";
+import type { SvgComponentMetadata } from "server/utils/FontManager/type";
+import { SvgIconCard } from "./components/SvgIconCard";
 import "./globals.css";
 
 const App = () => {
-    const [data, setData] = React.useState<SvgFileMetadata[]>([]);
+    const [data, setData] = React.useState<SvgComponentMetadata[]>([]);
 
     const fetchList = () => {
         fetch("/api/list")
             .then(res => res.json())
-            .then(res => setData(res.data));
+            .then(res => setData(res.data.component));
     };
 
     const rename = (oldName: string, newName: string) => {
@@ -61,7 +61,7 @@ const App = () => {
             </div>
             <div className=" grid grid-cols-8 gap-3">
                 {data.map(item => {
-                    return <IconCard key={item.fileName} data={item} onRemove={remove} onRename={rename} />;
+                    return <SvgIconCard key={item.fileName} data={item} onRemove={remove} onRename={rename} />;
                 })}
             </div>
         </div>

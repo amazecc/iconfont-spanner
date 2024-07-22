@@ -1,13 +1,13 @@
 import React from "react";
-import type { SvgFileMetadata } from "server/utils/FontManager/type";
+import type { SvgComponentMetadata } from "server/utils/FontManager/type";
 
-export interface IconCardProps {
-    data: SvgFileMetadata;
+export interface SvgIconCardProps {
+    data: SvgComponentMetadata;
     onRename?: (oldName: string, newName: string) => void;
     onRemove?: (name: string) => void;
 }
 
-export const IconCard: React.FC<IconCardProps> = React.memo(({ data, onRename, onRemove }) => {
+export const SvgIconCard: React.FC<SvgIconCardProps> = React.memo(({ data, onRename, onRemove }) => {
     const [focus, setFocus] = React.useState(false);
 
     return (
@@ -31,8 +31,8 @@ export const IconCard: React.FC<IconCardProps> = React.memo(({ data, onRename, o
             ) : (
                 <span onDoubleClick={() => setFocus(true)}>{data.fileName}</span>
             )}
-            <span>&amp;#x{data.unicodeHex.toString(16)};</span>
-            <span>{data.svgReactComponentName}</span>
+            {/* <span>&amp;#x{data.unicodeHex.toString(16)};</span> */}
+            <span>{data.name}</span>
             <span
                 className="cursor-pointer text-red-600"
                 onClick={() => {
