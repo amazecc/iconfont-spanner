@@ -4,22 +4,19 @@ import { exec } from "child_process";
 import { FontManagerOption } from "./FontManager/type";
 import { walkFileSync } from "./FontManager/utils";
 
-// TODO: 找到准确方案
 /**
  * 导入根目录文件
- * @param fileName 根目录文件名
- * @param currentFilename 运行该函数文件绝对地址
- * @returns 返回文件资源
+ * @param fileName 根目录文件名,可以是嵌套文件
+ * @returns 返回文件木模块
  */
-export const importRootFile = async (fileName: string, currentFilename: string) => {
-    const backToPwdPath = path.relative(currentFilename, process.cwd()); // 回退到 pwd 的地址字符，如 ../..
+export const importRootFile = async (fileName: string) => {
+    const backToPwdPath = path.relative(path.dirname(__filename), process.cwd()); // 回退到 pwd 的地址字符，如 ../..
     const filePath = path.join(backToPwdPath, fileName);
-    const result = await import(filePath);
-    return result;
+    return import(filePath);
 };
 
 /** 导入配置项 */
-export const importConfig = (): Promise<FontManagerOption> => importRootFile("iconfont.config.js", __dirname).then(res => res.default);
+export const importConfig = (): Promise<FontManagerOption> => importRootFile("iconfont.config.js").then(res => res.default);
 
 /** 根据名称获取文件绝对地址 */
 export const getFilePathByName = async (name: string) => {
