@@ -2,6 +2,7 @@ import path from "path";
 import fs from "fs-extra";
 import { exec } from "child_process";
 import { FontManagerOption } from "./FontManager/type";
+import { walkFileSync } from "./FontManager/utils";
 
 // TODO: 找到准确方案
 /**
@@ -14,11 +15,28 @@ export const importRootFile = async (fileName: string, currentFilename: string) 
     const backToPwdPath = path.relative(currentFilename, process.cwd()); // 回退到 pwd 的地址字符，如 ../..
     const filePath = path.join(backToPwdPath, fileName);
     const result = await import(filePath);
-	return result;
+    return result;
 };
 
 /** 导入配置项 */
 export const importConfig = (): Promise<FontManagerOption> => importRootFile("iconfont.config.js", __dirname).then(res => res.default);
+
+/** 根据名称获取文件绝对地址 */
+export const getFilePathByName = async (name: string) => {
+    const config = await importConfig();
+    let fileAbsolutePath = "";
+    walkFileSync(config.resourceDir, (filePath, isFile) => {
+        if (isFile) {
+            if (filePath && path.extname(filePath) === ".svg") {
+                const fileName = path.basename(filePath, ".svg");
+                if (fileName === name) {
+                    fileAbsolutePath = filePath;
+                }
+            }
+        }
+    });
+    return fileAbsolutePath;
+};
 
 /**
  * 执行 shell 命令并返回一个 Promise
@@ -36,25 +54,17 @@ export const execCommand = async (cmd: string): Promise<string> => {
 };
 
 /**
- * 检查当前目录是否在 Git 仓库中
- */
-export const isGitRepository = async () => {
-    try {
-        await execCommand("git rev-parse --is-inside-work-tree");
-        return true;
-    } catch (err) {
-        return false;
-    }
-};
-
-/**
- * 重命名文件或目录
+ * 重命名文件
  */
 export const renameFile = async (oldPath: string, newPath: string) => {
-    const isGitRepo = await isGitRepository();
-    if (isGitRepo) {
-        await execCommand(`git mv ${oldPath} ${newPath}`);
-    } else {
-        fs.renameSync(oldPath, newPath);
+    fs.renameSync(oldPath, newPath);
+
+    // 大小写变化，则 git mv 处理
+    const oldFileName = path.basename(oldPath);
+    const newFileName = path.basename(newPath);
+    if (oldFileName !== newFileName && oldFileName.toLocaleLowerCase() === newFileName.toLocaleLowerCase()) {
+        await execCommand(`git mv ${oldPath} ${newPath}`).catch(() => {
+            // 发生异常不做处理
+        });
     }
 };

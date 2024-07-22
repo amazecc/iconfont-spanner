@@ -1,40 +1,67 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import type { SvgFileMetadata } from "server/utils/FontManager/type";
+import { IconCard } from "./components/IconCard";
 import "./globals.css";
 
 const App = () => {
     const [data, setData] = React.useState<SvgFileMetadata[]>([]);
-    useEffect(() => {
+
+    const fetchList = () => {
         fetch("/api/list")
             .then(res => res.json())
-            .then(setData);
+            .then(res => setData(res.data));
+    };
+
+    const rename = (oldName: string, newName: string) => {
+        fetch("/api/rename", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json", // 设置请求头，指明请求体格式为 JSON
+            },
+            body: JSON.stringify({ oldName, newName }),
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    fetchList();
+                } else {
+                    alert(res.message);
+                }
+            });
+    };
+
+    const remove = (name: string) => {
+        fetch("/api/remove", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json", // 设置请求头，指明请求体格式为 JSON
+            },
+            body: JSON.stringify({ name }),
+        }).then(() => {
+            fetchList();
+        });
+    };
+
+    const generate = () => {
+        fetch("/api/generate", { method: "POST" }).then(() => {
+            alert("生成成功");
+        });
+    };
+
+    useEffect(() => {
+        fetchList();
     }, []);
 
     return (
         <div className="mx-auto max-w-screen-lg">
-            <h1 className="my-5 text-4xl font-bold">预览</h1>
-            <div>
-                <button
-                    onClick={() => {
-                        fetch("/api/generate", { method: "POST" }).then(() => {
-                            alert("生成成功");
-                        });
-                    }}
-                >
-                    生成字体
-                </button>
+            <div className="flex items-center justify-between">
+                <h1 className="my-5 text-4xl font-bold">预览</h1>
+                <button onClick={generate}>生成字体</button>
             </div>
             <div className=" grid grid-cols-8 gap-3">
                 {data.map(item => {
-                    return (
-                        <div key={item.fileName} className="flex flex-col items-center justify-center">
-                            <span className="text-[52px]" dangerouslySetInnerHTML={{ __html: item.svgOptimizeString }} />
-                            <span>{item.fileName}</span>
-                            <span>&amp;#x${item.unicodeHex.toString(16)};</span>
-                            <span>{item.svgReactComponentName}</span>
-                        </div>
-                    );
+                    return <IconCard key={item.fileName} data={item} onRemove={remove} onRename={rename} />;
                 })}
             </div>
         </div>

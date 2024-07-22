@@ -3,11 +3,13 @@ import Koa from "koa";
 import serve from "koa-static";
 import history from "koa2-connect-history-api-fallback";
 import cors from "@koa/cors";
+import { bodyParser } from "@koa/bodyparser";
 import { router } from "./router";
 
 const app = new Koa();
 
 app.use(cors())
+    .use(bodyParser())
     .use(router.routes())
     .use(router.allowedMethods())
     .use(serve(path.resolve(process.cwd(), "client")))
@@ -15,7 +17,7 @@ app.use(cors())
 
 export const startServer = (port = 3000) => {
     const server = app.listen(port, () => {
-        console.log(`visit server: http://localhost:${port}`);
+        console.log(`server: http://localhost:${port}`);
     });
 
     server.on("error", (err: any) => {
