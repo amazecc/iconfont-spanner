@@ -50,6 +50,7 @@ router.post("/api/remove", async ctx => {
     const { name } = ctx.request.body;
     const filePath = await getFilePathByName(name);
     fs.removeSync(filePath);
+    console.log(`[delete]: ${filePath}`);
     ctx.body = { success: true };
 });
 

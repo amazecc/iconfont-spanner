@@ -59,9 +59,16 @@ export const renameFile = async (oldPath: string, newPath: string) => {
     // 大小写变化，则 git mv 处理
     const oldFileName = path.basename(oldPath);
     const newFileName = path.basename(newPath);
+
     if (oldFileName !== newFileName && oldFileName.toLocaleLowerCase() === newFileName.toLocaleLowerCase()) {
-        await execCommand(`git mv ${oldPath} ${newPath}`).catch(() => {
-            // 发生异常不做处理
-        });
+        await execCommand(`git mv ${oldPath} ${newPath}`)
+            .then(() => {
+                console.log(`[rename]: ${oldFileName} -> ${newFileName}（大小写变化，追加 git mv 处理）`);
+            })
+            .catch(() => {
+                // 不做处理
+            });
+    } else {
+        console.log(`[rename]: ${oldFileName} -> ${newFileName}`);
     }
 };
