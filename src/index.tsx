@@ -1,16 +1,28 @@
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense, lazy } from "react";
 import ReactDOM from "react-dom/client";
-import type { SvgComponentMetadata } from "server/utils/FontManager/type";
-import { SvgIconCard } from "./components/SvgIconCard";
+import type { SvgComponentMetadata, FontMetadata } from "server/utils/FontManager/type";
 import "./globals.css";
 
+const SvgIconGrid = lazy(() => import("./components/SvgIconGrid"));
+const FontIconGrid = lazy(() => import("./components/FontIconGrid"));
+
+interface FontData {
+    font?: {
+        name: string;
+        metadata: FontMetadata[];
+    };
+    component?: {
+        metadata: SvgComponentMetadata[];
+    };
+}
+
 const App = () => {
-    const [data, setData] = React.useState<SvgComponentMetadata[]>([]);
+    const [{ font, component }, setData] = React.useState<FontData>({});
 
     const fetchList = () => {
         fetch("/api/list")
             .then(res => res.json())
-            .then(res => setData(res.data.component));
+            .then(res => setData(res.data));
     };
 
     const rename = (oldName: string, newName: string) => {
@@ -54,17 +66,30 @@ const App = () => {
     }, []);
 
     return (
-        <div className="mx-auto max-w-screen-lg">
-            <div className="flex items-center justify-between">
-                <h1 className="my-5 text-4xl font-bold">预览</h1>
-                <button onClick={generate}>生成字体</button>
+        <Suspense>
+            <div className="mx-auto max-w-screen-lg">
+                <div className="flex items-center justify-between">
+                    <h1 className="my-5 text-4xl font-bold">预览</h1>
+                    <button className="text-xl font-bold" onClick={generate}>
+                        生成字体
+                    </button>
+                </div>
+
+                {component && (
+                    <>
+                        <h2 className="my-5 text-2xl font-bold">SVG 组件</h2>
+                        <SvgIconGrid metadata={component.metadata} onRemove={remove} onRename={rename} />
+                    </>
+                )}
+
+                {font && (
+                    <>
+                        <h2 className="my-5 text-2xl font-bold">字体图标</h2>
+                        <FontIconGrid metadata={font.metadata} onRemove={remove} onRename={rename} />
+                    </>
+                )}
             </div>
-            <div className=" grid grid-cols-8 gap-3">
-                {data.map(item => {
-                    return <SvgIconCard key={item.fileName} data={item} onRemove={remove} onRename={rename} />;
-                })}
-            </div>
-        </div>
+        </Suspense>
     );
 };
 

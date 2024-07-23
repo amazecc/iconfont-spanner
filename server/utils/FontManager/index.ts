@@ -161,10 +161,11 @@ export class FontManager {
     /** 生成 font buffer */
     public async generateFontBuffer() {
         const svgBuffer = await this.generateSvgFontBuffer();
-        const ttfBuffer = Buffer.from(svg2ttf(svgBuffer.toString()).buffer);
+        const ttfUint8Array = svg2ttf(svgBuffer.toString()).buffer;
+        const ttfBuffer = Buffer.from(ttfUint8Array);
         return {
             ttfBuffer,
-            woffBuffer: () => ttf2woff(ttfBuffer),
+            woffBuffer: () => Buffer.from(ttf2woff(ttfUint8Array)), // NOTE: ttf2woff 返回的是一个 Uint8Array 而不是 Buffer, 这里需要转化一下，否则上层使用会发生问题
             woff2Buffer: () => ttf2woff2(ttfBuffer),
         };
     }

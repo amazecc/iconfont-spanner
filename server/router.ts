@@ -1,5 +1,4 @@
 import fs from "fs-extra";
-import path from "path";
 import Router from "@koa/router";
 import { FontManager } from "./utils/FontManager";
 import { getFilePathByName, importConfig, renameFile } from "./utils";
@@ -15,11 +14,13 @@ router.get("/api/list", async ctx => {
         data: {
             font: fontManager.option.output.fontName
                 ? {
-                      fontName: fontManager.option.output.fontName,
-                      fontMetadata: fontManager.fontMetadata,
+                      name: fontManager.option.output.fontName,
+                      metadata: fontManager.fontMetadata,
                   }
                 : undefined,
-            component: fontManager.option.output.component && fontManager.svgComponentMetadata,
+            component: fontManager.option.output.component && {
+                metadata: fontManager.svgComponentMetadata,
+            },
         },
     };
 });
@@ -53,9 +54,33 @@ router.post("/api/remove", async ctx => {
 });
 
 router.get("/api/ttf", async ctx => {
-    const data = fs.createReadStream(path.resolve(process.cwd(), "babel.config.js"));
-	ctx.set("Content-Type", "application/javascript");
-    ctx.body = data;
+    const config = await importConfig();
+    const fontManager = new FontManager(config);
+    fontManager.read();
+    const { ttfBuffer } = await fontManager.generateFontBuffer();
+    ctx.body = ttfBuffer;
+    ctx.set("Content-Disposition", `inline; filename="${fontManager.option.output.fontName ?? "font"}.ttf"`);
+    ctx.set("Content-Type", "font/ttf");
+});
+
+router.get("/api/woff", async ctx => {
+    const config = await importConfig();
+    const fontManager = new FontManager(config);
+    fontManager.read();
+    const { woffBuffer } = await fontManager.generateFontBuffer();
+    ctx.body = woffBuffer();
+    ctx.set("Content-Disposition", `inline; filename="${fontManager.option.output.fontName ?? "font"}.woff"`);
+    ctx.set("Content-Type", "font/woff");
+});
+
+router.get("/api/woff2", async ctx => {
+    const config = await importConfig();
+    const fontManager = new FontManager(config);
+    fontManager.read();
+    const { woff2Buffer } = await fontManager.generateFontBuffer();
+    ctx.body = woff2Buffer();
+    ctx.set("Content-Disposition", `inline; filename="${fontManager.option.output.fontName ?? "font"}.woff2"`);
+    ctx.set("Content-Type", "font/woff2");
 });
 
 export { router };

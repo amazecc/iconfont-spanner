@@ -8,8 +8,8 @@ import { router } from "./router";
 
 const app = new Koa();
 
-app.use(cors())
-    .use(bodyParser())
+app.use(bodyParser())
+    .use(cors())
     .use(router.routes())
     .use(router.allowedMethods())
     .use(serve(path.resolve(process.cwd(), "client")))
