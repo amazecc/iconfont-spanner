@@ -1,0 +1,13 @@
+.vscode
+node_modules
+script
+src
+.eslintignore
+.eslintrc.js
+.gitignore
+.prettierrc
+babel.config.js
+iconfont.config.js
+pnpm-lock.yaml
+twilwind.config.js
+tsconfig.json

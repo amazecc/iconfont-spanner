@@ -5,7 +5,11 @@
     "scripts": {
         "start": "NODE_ENV=development webpack-dev-server --config script/webpack/webpack.config.dev.ts",
         "build": "NODE_ENV=production webpack --config script/webpack/webpack.config.prod.ts",
-        "check": "ts-node script/check.ts"
+        "check": "ts-node script/check.ts",
+		"build-all": "tsc --project tsconfig.node.json && npm run build"
+    },
+    "bin": {
+        "iconfont": "./node-server/start.js"
     },
     "dependencies": {
         "@koa/bodyparser": "^5.1.1",

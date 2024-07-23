@@ -1,0 +1,13 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+		"allowSyntheticDefaultImports": true,
+        "outDir": "node-server",
+        "declaration": true,
+        "noEmit": false
+    },
+    "include": ["server"],
+    "exclude": ["node_modules", "node-server", "script"]
+}
