@@ -41,9 +41,9 @@ export class FontManager {
     }
 
     /**
-     * 生成 svg 字体文件
+     * 生成 svg 字体 buffer, 用于生成 ttf, woff, woff2 buffer
      */
-    private async generateSvgFont() {
+    private async generateSvgFontBuffer() {
         const fontStream = new SVGIcons2SVGFontStream({
             fontName: this.getFontName(), // 字体名称
             fontHeight: 1000, // 字体高度，1000是一个常用的值，确保图标清晰
@@ -53,10 +53,15 @@ export class FontManager {
                 // 不做任何操作，清除内部打印内容
             },
         });
-        return new Promise<void>((resolve, reject) => {
+        return new Promise<Buffer>((resolve, reject) => {
+            const chunks: Uint8Array[] = [];
             fontStream
-                .pipe(fs.createWriteStream(this.getOutputPath({ ext: "svg" })))
-                .on("finish", resolve)
+                .on("data", chunk => {
+                    chunks.push(chunk);
+                })
+                .on("end", () => {
+                    resolve(Buffer.concat(chunks));
+                })
                 .on("error", reject);
             this.fontMetadata.forEach(item => {
                 const glyph = fs.createReadStream(item.filePath) as fs.ReadStream & { metadata?: Metadata };
@@ -72,24 +77,10 @@ export class FontManager {
         });
     }
 
-    /** 根据 svg font 生成 ttf,woff,woff2 字体 */
-    private async generateFontBySvgFont() {
-        // 读取生成的 SVG 文件
-        const svgFont = fs.readFileSync(this.getOutputPath({ ext: "svg" }), "utf8");
-
-        const ttfBuffer = Buffer.from(svg2ttf(svgFont).buffer);
-        // 写入 TTF 文件
-        fs.writeFileSync(this.getOutputPath({ ext: "ttf" }), ttfBuffer);
-        // 写入 WOFF2 文件
-        fs.writeFileSync(this.getOutputPath({ ext: "woff2" }), ttf2woff2(ttfBuffer));
-        // 写入 WOFF 文件
-        fs.writeFileSync(this.getOutputPath({ ext: "woff" }), ttf2woff(ttfBuffer));
-    }
-
     /**
      * 生成 svg react 组件文件
      */
-    private async generateComponent(option: ComponentOption) {
+    private async writeComponent(option: ComponentOption) {
         await fs.ensureDir(this.getOutputPath({ dir: option.dir }));
         this.svgComponentMetadata.forEach(item => {
             const [fileName, ext] = option.fileName(item.fileName).split(".");
@@ -98,20 +89,31 @@ export class FontManager {
         });
     }
 
-    /** 生成 typescript 类型声明 */
-    private async generateTypeDeclaration() {
+    /** 写入 typescript 类型声明 */
+    private async writeTypeDeclarationFile() {
         const typeDeclarationString = getTypeDeclarationString(this.getFontName(), this.fontMetadata);
         fs.writeFileSync(this.getOutputPath({ ext: "ts" }), typeDeclarationString);
     }
 
-    /** 生成 css 文件 */
-    private async generateCss() {
+    /** 写入 css 文件 */
+    private async writeCSSFile() {
         const cssString = getCssString(this.getFontName(), this.fontMetadata);
         fs.writeFileSync(this.getOutputPath({ ext: "css" }), cssString);
     }
 
+    /** 写入 font 文件 */
+    private async writeFontFiles() {
+        const { ttfBuffer, woffBuffer, woff2Buffer } = await this.generateFontBuffer();
+        // 写入 TTF 文件
+        fs.writeFileSync(this.getOutputPath({ ext: "ttf" }), ttfBuffer);
+        // 写入 WOFF2 文件
+        fs.writeFileSync(this.getOutputPath({ ext: "woff2" }), woff2Buffer());
+        // 写入 WOFF 文件
+        fs.writeFileSync(this.getOutputPath({ ext: "woff" }), woffBuffer());
+    }
+
     /** 读取文件资源 */
-    read() {
+    public read() {
         const { fontName, component } = this.option.output;
         let initialUnicodeHex = 0xe000;
         walkFileSync(this.option.resourceDir, (filePath, isFile) => {
@@ -156,17 +158,27 @@ export class FontManager {
         }
     }
 
+    /** 生成 font buffer */
+    public async generateFontBuffer() {
+        const svgBuffer = await this.generateSvgFontBuffer();
+        const ttfBuffer = Buffer.from(svg2ttf(svgBuffer.toString()).buffer);
+        return {
+            ttfBuffer,
+            woffBuffer: () => ttf2woff(ttfBuffer),
+            woff2Buffer: () => ttf2woff2(ttfBuffer),
+        };
+    }
+
     /** 生成字体等资源文件 */
-    async generate() {
+    public async generate() {
         await fs.ensureDir(this.option.output.dir);
         if (this.option.output.fontName) {
-            await this.generateSvgFont();
-            await this.generateFontBySvgFont();
-            await this.generateTypeDeclaration();
-            await this.generateCss();
+            await this.writeFontFiles();
+            await this.writeTypeDeclarationFile();
+            await this.writeCSSFile();
         }
         if (this.option.output.component) {
-            await this.generateComponent(this.option.output.component);
+            await this.writeComponent(this.option.output.component);
         }
     }
 }

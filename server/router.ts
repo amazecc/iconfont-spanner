@@ -1,4 +1,5 @@
 import fs from "fs-extra";
+import path from "path";
 import Router from "@koa/router";
 import { FontManager } from "./utils/FontManager";
 import { getFilePathByName, importConfig, renameFile } from "./utils";
@@ -49,6 +50,12 @@ router.post("/api/remove", async ctx => {
     const filePath = await getFilePathByName(name);
     fs.removeSync(filePath);
     ctx.body = { success: true };
+});
+
+router.get("/api/ttf", async ctx => {
+    const data = fs.createReadStream(path.resolve(process.cwd(), "babel.config.js"));
+	ctx.set("Content-Type", "application/javascript");
+    ctx.body = data;
 });
 
 export { router };
