@@ -1,12 +1,12 @@
 {
     "name": "iconfont-spanner",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "iconfont utils",
     "bin": {
         "iconfont": "./out/start.js"
     },
-	"main": "./out/index.js",
-	"types": "./out/index.d.ts",
+    "main": "./out/index.js",
+    "types": "./out/index.d.ts",
     "dependencies": {
         "@koa/bodyparser": "^5.1.1",
         "@koa/cors": "^5.0.0",

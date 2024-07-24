@@ -8,9 +8,9 @@
         "build-server": "cd server && tsc",
         "build-client": "cd client && pnpm run build",
         "build-all": "cd server && rm -rf out && tsc && cd ../client && pnpm run build",
-        "major": "npm version major",
-        "minor": "npm version minor",
-        "patch": "npm version patch"
+        "major": "cd server && npm version major",
+        "minor": "cd server && npm version minor",
+        "patch": "cd server && npm version patch"
     },
     "devDependencies": {
         "@types/node": "^20.11.30",
