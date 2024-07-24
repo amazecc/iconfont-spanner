@@ -2,10 +2,10 @@
     "name": "iconfont-spanner",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
     "scripts": {
         "start-server": "tsx server/src/start.ts",
-        "start-client": "cd client && npm run start"
+        "start-client": "cd client && npm run start",
+        "build-server": "cd server && tsc"
     },
     "devDependencies": {
         "@types/node": "^20.11.30",

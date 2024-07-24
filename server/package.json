@@ -2,9 +2,11 @@
     "name": "iconfont-spanner",
     "version": "1.0.0",
     "description": "iconfont utils",
-    "scripts": {
-        "start": "tsx src/start.ts"
+    "bin": {
+        "iconfont": "./out/start.js"
     },
+	"main": "./out/index.js",
+	"types": "./out/index.d.ts",
     "dependencies": {
         "@koa/bodyparser": "^5.1.1",
         "@koa/cors": "^5.0.0",
@@ -20,6 +22,7 @@
         "ttf2woff2": "^5.0.0"
     },
     "devDependencies": {
+        "@types/fs-extra": "^11.0.4",
         "@types/koa": "^2.15.0",
         "@types/koa-static": "^4.0.4",
         "@types/koa__cors": "^5.0.0",

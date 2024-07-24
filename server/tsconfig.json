@@ -7,7 +7,7 @@
         "skipLibCheck": true,
         "removeComments": false,
         "allowJs": true,
-        "outDir": "build",
+        "outDir": "out",
         "declaration": true,
 
         /* Bundler mode */

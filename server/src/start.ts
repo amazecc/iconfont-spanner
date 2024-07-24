@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-import { startServer } from "./index";
+import { start } from "./service";
 
-console.log("???", process.cwd());
-
-startServer();
+start();
