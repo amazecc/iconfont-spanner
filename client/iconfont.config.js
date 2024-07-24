@@ -1,11 +1,11 @@
 const path = require("path");
-const { getSvgTSReactComponentContent, toBigCamelCase } = require("./server/src/utils/FontManager/utils");
+const { getSvgTSReactComponentContent, toBigCamelCase } = require("./node-server/utils/FontManager/utils");
 
-/** @type {import('./server/src/utils/FontManager/type').FontManagerOption} */
+/** @type {import('./server/utils/FontManager/type').FontManagerOption} */
 module.exports = {
-    resourceDir: path.join(process.cwd(), "client/src/svg"),
+    resourceDir: path.join(process.cwd(), "src/svg"),
     output: {
-        dir: path.join(process.cwd(), "client/src/font"),
+        dir: path.join(process.cwd(), "src/font"),
         fontName: "iconfont",
         component: {
             dir: "react-components",

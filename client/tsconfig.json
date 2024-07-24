@@ -1,0 +1,44 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "useDefineForClassFields": true,
+        "lib": ["ESNext", "DOM"],
+        "module": "ESNext",
+        "skipLibCheck": true,
+        "removeComments": false,
+        "allowJs": true,
+
+        /* Bundler mode */
+        "moduleResolution": "Bundler",
+        "allowImportingTsExtensions": false,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "isolatedModules": true,
+        "noEmit": false,
+        "jsx": "react-jsx",
+
+        /* Linting */
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedIndexedAccess": true, // 通过下标获取元素，默认添加 undefined 类型
+        "forceConsistentCasingInFileNames": true, // 必须配置，严格区分导入文件大侠写
+        "noImplicitReturns": true, // 必须配置，若函数需要返回一个值，那么保证函数每个执行分支都存在返回值
+        "noImplicitOverride": true, // 必须配置，对父类方法的覆盖，使用 override 关键字指明
+        "exactOptionalPropertyTypes": false,
+        "baseUrl": ".",
+        "paths": {
+            "src/*": ["src/*"],
+			"server/*": ["../server/*"],
+        }
+    },
+    "include": ["src", "script", "server/**/type.ts"],
+    "exclude": ["node_modules"],
+    "ts-node": {
+        "compilerOptions": {
+            "module": "CommonJS"
+        }
+    }
+}

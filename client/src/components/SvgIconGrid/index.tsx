@@ -1,5 +1,5 @@
 import React from "react";
-import type { SvgComponentMetadata } from "server/utils/FontManager/type";
+import type { SvgComponentMetadata } from "server/src/utils/FontManager/type";
 import { SvgIconCard, type SvgIconCardProps } from "./SvgIconCard";
 
 export interface SvgIconGridProps extends Pick<SvgIconCardProps, "onRemove" | "onRename"> {

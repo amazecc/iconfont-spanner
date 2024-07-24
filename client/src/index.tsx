@@ -1,6 +1,6 @@
 import React, { useEffect, Suspense, lazy } from "react";
 import ReactDOM from "react-dom/client";
-import type { SvgComponentMetadata, FontMetadata } from "server/utils/FontManager/type";
+import type { SvgComponentMetadata, FontMetadata } from "server/src/utils/FontManager/type";
 import "./globals.css";
 
 const SvgIconGrid = lazy(() => import("./components/SvgIconGrid"));

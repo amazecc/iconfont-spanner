@@ -8,14 +8,12 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-client
-node-server
+build
 dist-ssr
 *.local
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
+.vscode
 .idea
 .DS_Store
 *.suo
@@ -23,3 +21,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+*.tsbuildinfo
