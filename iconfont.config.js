@@ -1,5 +1,5 @@
 const path = require("path");
-const { getSvgTSReactComponentContent, toBigCamelCase } = require("./server");
+const { getSvgTSReactComponentContent, toBigCamelCase } = require("./server/src");
 
 /** @type {import('./server').FontManagerOption} */
 module.exports = {

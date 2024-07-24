@@ -4,8 +4,13 @@
     "description": "",
     "scripts": {
         "start-server": "tsx server/src/start.ts",
-        "start-client": "cd client && npm run start",
-        "build-server": "cd server && tsc"
+        "start-client": "cd client && pnpm run start",
+        "build-server": "cd server && tsc",
+        "build-client": "cd client && pnpm run build",
+        "build-all": "cd server && rm -rf out && tsc && cd ../client && pnpm run build",
+        "major": "npm version major",
+        "minor": "npm version minor",
+        "patch": "npm version patch"
     },
     "devDependencies": {
         "@types/node": "^20.11.30",

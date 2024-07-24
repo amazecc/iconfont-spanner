@@ -144,6 +144,8 @@ export const optimizeSvgString = (svg: string, fillCurrentColor: boolean) => {
 /** 获取 typescript 版本的 svg react 组件内容 */
 export const getSvgTSReactComponentContent: ComponentOption["content"] = (name, svgString) => {
     return `
+/* eslint-disable */
+
 export interface ${name}Props extends React.SVGAttributes<SVGSVGElement> {}
 
 export const ${name} = (props: ${name}Props) => {
@@ -157,6 +159,8 @@ export const ${name} = (props: ${name}Props) => {
 /** 获取 javascript 版本的 svg react 组件内容 */
 export const getSvgJSReactComponentContent: ComponentOption["content"] = (name, svgString) => {
     return `
+/* eslint-disable */
+
 export const ${name} = (props) => {
 	return (
 		${svgString.replace(/<svg.+?>/gm, item => `${item.slice(0, item.length - 1)} {...props}>`)}
