@@ -14,7 +14,7 @@ module.exports = {
         dir: path.join(process.cwd(), "client/src/font"),
         font: {
             name: "iconfont",
-            format: (content, type) => formatCode(content, type),
+            format: formatCode,
         },
         component: {
             dir: "react-components",

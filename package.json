@@ -7,6 +7,21 @@
     },
     "main": "./out/index.js",
     "types": "./out/index.d.ts",
+    "homepage": "https://github.com/amazecc/iconfont-spanner",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/amazecc/iconfont-spanner"
+    },
+    "keywords": [
+        "iconfont",
+        "iconfont-spanner",
+        "svg",
+        "svg icon",
+        "web icon",
+        "font icon"
+    ],
+    "author": "",
+    "license": "MIT",
     "scripts": {
         "start-server": "tsx src/start.ts",
         "start-client": "cd client && pnpm run start",
@@ -52,8 +67,5 @@
         "tailwindcss": "^3.4.6",
         "tsx": "^4.16.2",
         "typescript": "5.5.4"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "MIT"
+    }
 }
