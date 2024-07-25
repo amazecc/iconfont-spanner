@@ -10,8 +10,8 @@ npm i -D iconfont-spanner
 
 ## 使用
 
-1. 项目根目录新建配置文件 `iconfont-spanner.config.js`
-2. 执行 `npx iconfont-spanner` 启动本地服务，访问地址将在终端显示，打开地址可对图标进行编辑删除，重新生成 iconfont 操作。
+1. 项目根目录新建配置文件 `iconfont.config.js`
+2. 执行 `npx iconfont` 启动本地服务，访问地址将在终端显示，打开地址可对图标进行编辑删除，重新生成 iconfont 操作。
 
 ## 配置说明
 
