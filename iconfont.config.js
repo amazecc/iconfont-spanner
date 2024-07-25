@@ -1,13 +1,13 @@
 const path = require("path");
 const fs = require("fs");
 const prettier = require("prettier");
-const { getSvgTSReactComponentContent, toBigCamelCase } = require("./server/src");
+const { getSvgTSReactComponentContent, toBigCamelCase } = require("./src");
 
 const formatCode = (code, parser) => {
     return prettier.format(code, { ...JSON.parse(fs.readFileSync(path.resolve(__dirname, ".prettierrc"))).toString(), parser });
 };
 
-/** @type {import('./server/src').FontManagerOption} */
+/** @type {import('./src').FontManagerOption} */
 module.exports = {
     resourceDir: path.join(process.cwd(), "client/src/svg"),
     output: {

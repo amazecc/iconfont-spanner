@@ -1,5 +1,5 @@
 import React from "react";
-import type { SvgComponentMetadata } from "server/src/utils/FontManager/type";
+import type { SvgComponentMetadata } from "@/utils/FontManager/type";
 
 export interface SvgIconCardProps {
     data: SvgComponentMetadata;

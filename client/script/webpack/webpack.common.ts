@@ -8,7 +8,7 @@ import { version } from "./config";
 const config: Configuration = {
     entry: path.resolve(__dirname, "../../src/index.tsx"),
     output: {
-        path: path.resolve(__dirname, "../../../server/out/static"),
+        path: path.resolve(__dirname, "../../../out/static"),
         publicPath: "/",
     },
     resolve: {

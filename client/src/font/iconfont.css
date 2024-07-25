@@ -1,27 +1,27 @@
-
 @font-face {
-    font-family: "iconfont";
-    src: url("iconfont.ttf?t=1721718079048") format("truetype"),
-		url("iconfont.woff?t=1721718079048") format("woff"),
-		url("iconfont.woff2?t=1721718079048") format("woff2");
+  font-family: "iconfont";
+  src:
+    url("iconfont.ttf?t=1721893213644") format("truetype"),
+    url("iconfont.woff?t=1721893213644") format("woff"),
+    url("iconfont.woff2?t=1721893213644") format("woff2");
 }
 
 .iconfont {
-    font-family: "iconfont" !important;
-    font-size: 16px;
-    font-style: normal;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .icon-add_oc::before {
-	content: "\E001";
+  content: "\E001";
 }
 
 .icon-area::before {
-	content: "\E002";
+  content: "\E002";
 }
 
 .icon-color_oc::before {
-	content: "\E003";
+  content: "\E003";
 }

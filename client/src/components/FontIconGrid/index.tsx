@@ -1,5 +1,5 @@
 import React from "react";
-import type { FontMetadata } from "server/src/utils/FontManager/type";
+import type { FontMetadata } from "@/utils/FontManager/type";
 import { type FontIconCardProps, FontIconCard } from "./FontCard";
 
 export interface FontIconGridProps extends Pick<FontIconCardProps, "onRemove" | "onRename"> {

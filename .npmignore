@@ -1,0 +1,11 @@
+.vscode
+client
+node_modules
+src
+.eslintignore
+.eslintrc.js
+.gitignore
+.npmignore
+.prettierrc
+iconfont.config.js
+tsconfig.json
