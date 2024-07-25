@@ -21,13 +21,13 @@ export class FontManager {
         this.option = option;
     }
 
-    /** 获取字体名称 */
-    private getFontName() {
-        const { fontName } = this.option.output;
-        if (!fontName) {
+    /** 获取字体配置 */
+    private getFont() {
+        const { font } = this.option.output;
+        if (!font) {
             throw new Error("请在配置文件中设置字体名称");
         }
-        return fontName;
+        return font;
     }
 
     /**
@@ -36,7 +36,7 @@ export class FontManager {
      * @returns 文件绝对地址
      */
     private getOutputPath(info: OutputFile) {
-        const { dir = "", name = this.option.output.fontName, ext } = info;
+        const { dir = "", name = this.option.output.font?.name, ext } = info;
         return path.resolve(this.option.output.dir, dir, ext && name ? `${name}.${ext}` : "");
     }
 
@@ -45,7 +45,7 @@ export class FontManager {
      */
     private async generateSvgFontBuffer() {
         const fontStream = new SVGIcons2SVGFontStream({
-            fontName: this.getFontName(), // 字体名称
+            fontName: this.getFont().name, // 字体名称
             fontHeight: 1000, // 字体高度，1000是一个常用的值，确保图标清晰
             normalize: true, // 归一化图标大小
             centerHorizontally: true, // 水平居中图标
@@ -85,19 +85,23 @@ export class FontManager {
         this.svgComponentMetadata.forEach(item => {
             const [fileName, ext] = option.fileName(item.fileName).split(".");
             const name = option.name(item.fileName);
-            fs.writeFile(this.getOutputPath({ dir: option.dir, name: fileName, ext }), option.content(name, item.svgOptimizeString, item.fileName));
+            Promise.resolve(option.content(name, item.svgOptimizeString, item.fileName)).then(content => {
+                fs.writeFile(this.getOutputPath({ dir: option.dir, name: fileName, ext }), content);
+            });
         });
     }
 
     /** 写入 typescript 类型声明 */
     private async writeTypeDeclarationFile() {
-        const typeDeclarationString = getTypeDeclarationString(this.getFontName(), this.fontMetadata);
+        const { format = css => css } = this.getFont();
+        const typeDeclarationString = await format(getTypeDeclarationString(this.getFont().name, this.fontMetadata), "typescript");
         fs.writeFileSync(this.getOutputPath({ ext: "ts" }), typeDeclarationString);
     }
 
     /** 写入 css 文件 */
     private async writeCSSFile() {
-        const cssString = getCssString(this.getFontName(), this.fontMetadata);
+        const { name, format = css => css } = this.getFont();
+        const cssString = await format(getCssString(name, this.fontMetadata), "css");
         fs.writeFileSync(this.getOutputPath({ ext: "css" }), cssString);
     }
 
@@ -114,14 +118,14 @@ export class FontManager {
 
     /** 读取文件资源 */
     public read() {
-        const { fontName, component } = this.option.output;
+        const { font, component } = this.option.output;
         let initialUnicodeHex = 0xe000;
         walkFileSync(this.option.resourceDir, (filePath, isFile) => {
             if (isFile) {
                 if (filePath && path.extname(filePath) === ".svg") {
                     const fileName = path.basename(filePath, ".svg");
                     // 如果开启 font 生成
-                    if (fontName) {
+                    if (font) {
                         this.fontMetadata.push({
                             filePath,
                             fileName,
@@ -151,8 +155,8 @@ export class FontManager {
             const duplicatesFileNames = findDuplicates(fileNames);
             if (duplicatesFileNames.length) {
                 const duplicatesFilePath = metadata.filter(item => duplicatesFileNames.includes(item.fileName)).map(item => item.filePath);
-                console.log("【异常】文件名重复：\n");
-                console.log(duplicatesFilePath.join("\n"));
+                console.error("【ERROR】文件名重复：\n");
+                console.error(duplicatesFilePath.join("\n"));
                 process.exit(1);
             }
         }
@@ -172,8 +176,12 @@ export class FontManager {
 
     /** 生成字体等资源文件 */
     public async generate() {
+        if (!this.option.output.font && !this.option.output.component) {
+            console.error("【ERROR】output.font 和 output.component 必须至少设置一个");
+            process.exit(1);
+        }
         await fs.ensureDir(this.option.output.dir);
-        if (this.option.output.fontName) {
+        if (this.option.output.font) {
             await this.writeFontFiles();
             await this.writeTypeDeclarationFile();
             await this.writeCSSFile();

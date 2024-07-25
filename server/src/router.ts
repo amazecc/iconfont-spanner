@@ -12,9 +12,9 @@ router.get("/api/list", async ctx => {
     ctx.body = {
         success: true,
         data: {
-            font: fontManager.option.output.fontName
+            font: fontManager.option.output.font?.name
                 ? {
-                      name: fontManager.option.output.fontName,
+                      name: fontManager.option.output.font?.name,
                       metadata: fontManager.fontMetadata,
                   }
                 : undefined,
@@ -60,7 +60,7 @@ router.get("/api/ttf", async ctx => {
     fontManager.read();
     const { ttfBuffer } = await fontManager.generateFontBuffer();
     ctx.body = ttfBuffer;
-    ctx.set("Content-Disposition", `inline; filename="${fontManager.option.output.fontName ?? "font"}.ttf"`);
+    ctx.set("Content-Disposition", `inline; filename="${fontManager.option.output.font?.name ?? "font"}.ttf"`);
     ctx.set("Content-Type", "font/ttf");
 });
 
@@ -70,7 +70,7 @@ router.get("/api/woff", async ctx => {
     fontManager.read();
     const { woffBuffer } = await fontManager.generateFontBuffer();
     ctx.body = woffBuffer();
-    ctx.set("Content-Disposition", `inline; filename="${fontManager.option.output.fontName ?? "font"}.woff"`);
+    ctx.set("Content-Disposition", `inline; filename="${fontManager.option.output.font?.name ?? "font"}.woff"`);
     ctx.set("Content-Type", "font/woff");
 });
 
@@ -80,7 +80,7 @@ router.get("/api/woff2", async ctx => {
     fontManager.read();
     const { woff2Buffer } = await fontManager.generateFontBuffer();
     ctx.body = woff2Buffer();
-    ctx.set("Content-Disposition", `inline; filename="${fontManager.option.output.fontName ?? "font"}.woff2"`);
+    ctx.set("Content-Disposition", `inline; filename="${fontManager.option.output.font?.name ?? "font"}.woff2"`);
     ctx.set("Content-Type", "font/woff2");
 });
 

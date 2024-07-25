@@ -6,7 +6,7 @@ export interface FontManagerOption {
         /** 资源输出文件夹 */
         dir: string;
         /** 字体名称 */
-        fontName?: string;
+        font?: FontOption;
         /** svg 组件生成配置 */
         component?: ComponentOption;
     };
@@ -20,12 +20,19 @@ export interface ComponentOption {
     /** 组件名 */
     name: (fileName: string) => string;
     /** 组件代码 */
-    content: (name: string, svgString: string, fileName: string) => string;
+    content: (name: string, svgString: string, fileName: string) => string | Promise<string>;
     /**
      * 是否使用 currentColor 填充颜色，这将继承 fontColor
      * @default true
      */
     fillCurrentColor?: boolean | ((fileName: string) => boolean);
+}
+
+export interface FontOption {
+    /** 字体名称 */
+    name: string;
+    /** 针对生成文件内容进行格式化 */
+    format?: (content: string, type: "css" | "typescript") => string | Promise<string>;
 }
 
 // *********************************************************************************************************
@@ -36,8 +43,8 @@ export interface SvgComponentMetadata {
     filePath: string;
     /** 文件名, 不包含后缀，该名称将作为图标类名 */
     fileName: string;
-	/** 组件名称 */
-	name: string;
+    /** 组件名称 */
+    name: string;
     /** svg 优化后的字符 */
     svgOptimizeString: string;
     /** 是否使用 currentColor 填充 */
