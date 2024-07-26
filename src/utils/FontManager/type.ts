@@ -19,7 +19,7 @@ export interface FontManagerOption {
         /** 包含的文件夹 */
         includes: string[];
         /** 排除的文件夹, 一般要排除输出目录 output.dir */
-        excludes: string[];
+        excludes?: string[];
     };
 }
 
