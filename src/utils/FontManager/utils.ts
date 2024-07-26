@@ -79,8 +79,8 @@ export const getCssString = (fontName: string, metadata: FontMetadata[]) => {
 		url("${fontName}.woff2?t=${now}") format("woff2")`};
 }
 
-.iconfont {
-    font-family: "iconfont" !important;
+.${fontName} {
+    font-family: "${fontName}" !important;
     font-size: 16px;
     font-style: normal;
     -webkit-font-smoothing: antialiased;

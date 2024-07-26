@@ -27,6 +27,9 @@ export class FontManager {
         if (!font) {
             throw new Error("请在配置文件中设置字体名称");
         }
+        if (!/^[a-zA-Z][\w-]*$/.test(font.name)) {
+            throw new Error("font.name 必须以字母开头，且只能包含字母、下划线和连字符");
+        }
         return font;
     }
 
