@@ -49,7 +49,7 @@ const config: Configuration = merge(common, {
             IS_DEV: JSON.stringify(false),
         }),
         new CleanWebpackPlugin({
-            cleanOnceBeforeBuildPatterns: [path.resolve(__dirname, "../../../out/static")],
+            cleanOnceBeforeBuildPatterns: [path.resolve(__dirname, "../../out/static")],
         }),
         new MiniCssExtractPlugin({
             filename: `${version}/css/[name].[contenthash:8].css`,
