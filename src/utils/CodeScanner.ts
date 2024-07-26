@@ -27,7 +27,8 @@ export class CodeScanner {
             this.filePaths.map(filePath =>
                 CodeScanner.readlinePromise(filePath, line => {
                     keywords.forEach(keyword => {
-                        if (line.includes(keyword)) {
+                        const regex = new RegExp(`(?<!\\s*((\\/\\/|\\/\\*\\*|\\*|type\\s+\\w+\\s*=|\\w+\\s*:).+))${keyword}`);
+                        if (regex.test(line)) {
                             usedSet.add(keyword);
                         }
                     });
