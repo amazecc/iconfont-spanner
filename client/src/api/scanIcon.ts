@@ -19,7 +19,7 @@ export const scanIcon = async () => {
         .then(res => res.json())
         .then(res => {
             if (res.success) {
-                return res.data as FontUsage;
+                return res.data as FontUsage | null;
             }
             throw new Error(res.message);
         });

@@ -32,6 +32,7 @@ module.exports = {
     resourceDir: path.join(__dirname, "src/assets/svgs"),
     output: {
         dir: path.join(__dirname, "src/assets/font"),
+        // <---------------------
         font: {
             name: "iconfont",
             format: formatCode,
@@ -57,6 +58,7 @@ module.exports = {
     resourceDir: path.join(__dirname, "src/assets/svgs"),
     output: {
         dir: path.join(__dirname, "src/assets/font"),
+        // <---------------------
         component: {
             dir: "react-components", // 输出目录，相对 output.dir 的相对路径
             fileName: fileName => `Svg${toBigCamelCase(fileName)}.tsx`, // 组件文件名称
@@ -89,7 +91,41 @@ export const ${name} = (props: ${name}Props) => {
 };
 ```
 
-3. 支持同时生成字体与 svg 组件
+3. 检查图标在项目中的引用情况
+
+```javascript
+const path = require("path");
+const fs = require("fs");
+const prettier = require("prettier");
+const { getSvgTSReactComponentContent, toBigCamelCase } = require("iconfont-spanner");
+
+const formatCode = (code, parser) => {
+    return prettier.format(code, { ...JSON.parse(fs.readFileSync(path.resolve(__dirname, ".prettierrc"))).toString(), parser });
+};
+
+/** @type {import('iconfont-spanner').FontManagerOption} */
+module.exports = {
+    resourceDir: path.join(__dirname, "src/assets/svgs"),
+    output: {
+        dir: path.join(__dirname, "src/assets/font"),
+        component: {
+            dir: "react-components", // 输出目录，相对 output.dir 的相对路径
+            fileName: fileName => `Svg${toBigCamelCase(fileName)}.tsx`, // 组件文件名称
+            name: fileName => `Svg${toBigCamelCase(fileName)}`, // 组件名称
+            content: (...args) => formatCode(getSvgTSReactComponentContent(...args), "typescript"), // 组件代码内容, 并格式化
+            fillCurrentColor: fileName => !fileName.endsWith("_oc"), // 文件名以 _oc 结尾的 svg 组件不清除颜色，如：icon_oc.svg
+        },
+    },
+    // <------------------
+    scanDir: {
+        rootDir: process.cwd(), // 文件扫描根目录，默认 process.cwd()
+        includes: ["src/**/*.{ts,tsx,js,jsx}"], // 扫描的文件
+        excludes: ["src/assets/font/**/*", "**/*.d.ts"], // 排除的文件，一般会排除掉输出目录（output.dir）
+    },
+};
+```
+
+4. 支持同时生成字体与 svg 组件
 
 ## 输出内容
 

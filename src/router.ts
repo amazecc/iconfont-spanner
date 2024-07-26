@@ -77,15 +77,18 @@ router.get("/api/scan", async ctx => {
 
         ctx.body = {
             success: true,
-            data: {
-                font: config.output.font && (await getFontUsage()),
-                component: config.output.component && (await getSvgUsage()),
-            },
+            data:
+                config.output.font || config.output.component
+                    ? {
+                          font: config.output.font && (await getFontUsage()),
+                          component: config.output.component && (await getSvgUsage()),
+                      }
+                    : null,
         };
     } else {
         ctx.body = {
             success: false,
-            message: "未配置扫描目录",
+            message: "请配置扫描目录",
         };
     }
 });
