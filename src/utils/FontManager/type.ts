@@ -10,6 +10,17 @@ export interface FontManagerOption {
         /** svg 组件生成配置 */
         component?: ComponentOption;
     };
+    /**
+     * 代码扫描文件夹，将在该文件夹内扫描图标使用情况
+     */
+    scanDir?: {
+        /** 基于该目录扫表，默认 process.cwd() */
+        rootDir?: string;
+        /** 包含的文件夹 */
+        includes: string[];
+        /** 排除的文件夹, 一般要排除输出目录 output.dir */
+        excludes: string[];
+    };
 }
 
 export interface ComponentOption {

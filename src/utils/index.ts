@@ -18,8 +18,8 @@ export const importRootFile = async (fileName: string) => {
 /** 导入配置项 */
 export const importConfig = (): Promise<FontManagerOption> => importRootFile("iconfont.config.js").then(res => res.default);
 
-/** 根据名称获取文件绝对地址 */
-export const getFilePathByName = async (name: string) => {
+/** 根据名称获取 svg 文件绝对地址 */
+export const getSvgFilePathByName = async (name: string) => {
     const config = await importConfig();
     let fileAbsolutePath = "";
     walkFileSync(config.resourceDir, (filePath, isFile) => {

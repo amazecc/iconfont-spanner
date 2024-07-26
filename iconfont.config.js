@@ -24,4 +24,9 @@ module.exports = {
             fillCurrentColor: fileName => !fileName.endsWith("_oc"),
         },
     },
+    scanDir: {
+        rootDir: path.join(process.cwd(), "client"),
+        includes: ["src/**/*.{ts,tsx,js,jsx}"],
+        excludes: ["src/font/**/*", "**/*.d.ts"],
+    },
 };
