@@ -13,7 +13,7 @@ export const FontIconCard: React.FC<FontIconCardProps> = React.memo(({ data, use
 
     return (
         <div key={data.fileName} className="relative flex flex-col items-center justify-center">
-            <span className="iconfont text-[52px]" dangerouslySetInnerHTML={{ __html: `&#x${data.unicodeHex.toString(16)};` }} />
+            <span className={`iconfont text-[52px] leading-none ${data.fileName}`} />
             {focus ? (
                 <input
                     defaultValue={data.fileName}
