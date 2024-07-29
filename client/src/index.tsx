@@ -1,12 +1,15 @@
 import React, { useEffect, Suspense, lazy } from "react";
 import ReactDOM from "react-dom/client";
-import "./globals.css";
+import { Button } from "antd";
 import { getIconList, type FontData } from "./api/getIconList";
 import { renameIcon } from "./api/renameIcon";
 import { removeIcon } from "./api/removeIcon";
 import { generateIcon } from "./api/generateIcon";
 import { scanIcon, type FontUsage } from "./api/scanIcon";
 import { IconArea } from "./font/react-components/IconArea";
+import "./globals.css";
+import { UploadModal } from "./components/UploadModal";
+import { useBoolean } from "ahooks";
 
 const SvgIconGrid = lazy(() => import("./components/SvgIconGrid"));
 const FontIconGrid = lazy(() => import("./components/FontIconGrid"));
@@ -16,13 +19,13 @@ const App = () => {
 
     const [usage, setUsage] = React.useState<FontUsage | null>(null);
 
+    const [open, { setFalse, setTrue }] = useBoolean();
+
     const fetchList = () => getIconList().then(res => setData(res));
 
     const rename = (oldName: string, newName: string) => {
         renameIcon(oldName, newName)
-            .then(() => {
-                fetchList();
-            })
+            .then(fetchList)
             .catch(err => {
                 alert(err.message);
             });
@@ -69,12 +72,15 @@ const App = () => {
                         <IconArea />
                         <span className="iconfont icon-color_oc" />
                     </h1>
-                    <button className="text-xl font-bold" onClick={scan}>
+                    <Button type="primary" onClick={scan}>
                         扫描
-                    </button>
-                    <button className="text-xl font-bold" onClick={generate}>
+                    </Button>
+                    <Button type="primary" onClick={setTrue}>
+                        上传
+                    </Button>
+                    <Button type="primary" onClick={generate}>
                         生成字体
-                    </button>
+                    </Button>
                 </div>
 
                 {component && (
@@ -90,6 +96,7 @@ const App = () => {
                         <FontIconGrid usage={usage?.font} metadata={font.metadata} onRemove={remove} onRename={rename} />
                     </>
                 )}
+                <UploadModal open={open} onClose={setFalse} onSuccess={fetchList} />
             </div>
         </Suspense>
     );

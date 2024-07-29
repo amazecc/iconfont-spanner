@@ -1,5 +1,6 @@
 import React from "react";
-import type { FontMetadata } from "@/utils/FontManager/type";
+import type { FontMetadata } from "server/utils/FontManager/type";
+import { EditableText } from "../basic/EditableText";
 
 export interface FontIconCardProps {
     data: FontMetadata;
@@ -9,29 +10,16 @@ export interface FontIconCardProps {
 }
 
 export const FontIconCard: React.FC<FontIconCardProps> = React.memo(({ data, useType, onRename, onRemove }) => {
-    const [focus, setFocus] = React.useState(false);
-
     return (
         <div key={data.fileName} className="relative flex flex-col items-center justify-center">
             <span className={`iconfont text-[52px] leading-none ${data.fileName}`} />
-            {focus ? (
-                <input
-                    defaultValue={data.fileName}
-                    onBlur={() => setFocus(false)}
-                    onChange={e => e.target.value}
-                    // eslint-disable-next-line jsx-a11y/no-autofocus
-                    autoFocus
-                    className="w-full rounded border-blue-400 bg-gray-100 text-center"
-                    onKeyUp={e => {
-                        const target = e.target as HTMLInputElement;
-                        if (e.key === "Enter") {
-                            onRename?.(data.fileName, target.value);
-                        }
-                    }}
-                />
-            ) : (
-                <span onDoubleClick={() => setFocus(true)}>{data.fileName}</span>
-            )}
+            <EditableText onConfirm={value => onRename?.(data.fileName, value)}>
+                {start => (
+                    <span className="leading-6" onDoubleClick={() => start(data.fileName)}>
+                        {data.fileName}
+                    </span>
+                )}
+            </EditableText>
             <span>&#x{data.unicodeHex.toString(16)};</span>
             <span
                 className="cursor-pointer text-red-600"

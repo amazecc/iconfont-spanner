@@ -3,8 +3,9 @@ import path from "path";
 import { glob } from "glob";
 import Router from "@koa/router";
 import { FontManager } from "./utils/FontManager";
-import { getSvgFilePathByName, importConfig, renameFile } from "./utils";
+import { getSvgFileNames, getSvgFilePathByName, importConfig, renameFile } from "./utils";
 import { CodeScanner } from "./utils/CodeScanner";
+import { findDuplicates } from "./utils/FontManager/utils";
 
 const router = new Router();
 
@@ -41,9 +42,13 @@ router.post("/api/rename", async ctx => {
     const { oldName, newName } = ctx.request.body;
     if (/^[a-zA-Z-_]+$/.test(newName)) {
         const oldPath = await getSvgFilePathByName(oldName);
-        const newPath = oldPath.replace(`${oldName}.svg`, `${newName}.svg`);
-        await renameFile(oldPath, newPath);
-        ctx.body = { success: true };
+        if (oldPath) {
+            const newPath = oldPath.replace(`${oldName}.svg`, `${newName}.svg`);
+            await renameFile(oldPath, newPath);
+            ctx.body = { success: true };
+        } else {
+            ctx.body = { success: false, message: "该原始文件不存在，请刷新页面" };
+        }
     } else {
         ctx.body = { success: false, message: "名称只能包含字母、下划线和中划线" };
     }
@@ -52,9 +57,40 @@ router.post("/api/rename", async ctx => {
 router.post("/api/remove", async ctx => {
     const { name } = ctx.request.body;
     const filePath = await getSvgFilePathByName(name);
-    fs.removeSync(filePath);
-    console.log(`[delete]: ${filePath}`);
+    if (filePath) {
+        fs.removeSync(filePath);
+        console.log(`[delete]: ${filePath}`);
+    }
     ctx.body = { success: true };
+});
+
+type AddData = { name: string; svg: string }[];
+
+router.post("/api/add", async ctx => {
+    const config = await importConfig();
+    const data = ctx.request.body.data as AddData;
+    const fileNames = await getSvgFileNames();
+    const repeatNames = findDuplicates(data.map(item => item.name).concat(fileNames));
+    if (repeatNames.length > 0) {
+        ctx.body = {
+            success: true,
+            data: {
+                names: fileNames,
+                repeatNames,
+            },
+        };
+    } else {
+        const tasks = data.map(item => {
+            const filePath = path.join(config.resourceDir, `${item.name}.svg`);
+            return {
+                filePath,
+                task: fs.writeFile(filePath, item.svg),
+            };
+        });
+        await Promise.all(tasks.map(item => item.task));
+        console.log(`[add]: \n${tasks.map(item => item.filePath).join("\n")}`);
+        ctx.body = { success: true };
+    }
 });
 
 router.get("/api/scan", async ctx => {

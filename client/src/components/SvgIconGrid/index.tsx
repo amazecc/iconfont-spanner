@@ -1,5 +1,5 @@
 import React from "react";
-import type { SvgComponentMetadata } from "@/utils/FontManager/type";
+import type { SvgComponentMetadata } from "server/utils/FontManager/type";
 import { SvgIconCard, type SvgIconCardProps } from "./SvgIconCard";
 import { type FontUsage } from "../../api/scanIcon";
 

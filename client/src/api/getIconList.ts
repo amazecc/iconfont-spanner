@@ -1,4 +1,4 @@
-import type { SvgComponentMetadata, FontMetadata } from "@/utils/FontManager/type";
+import type { SvgComponentMetadata, FontMetadata } from "server/utils/FontManager/type";
 
 export interface FontData {
     font?: {

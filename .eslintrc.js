@@ -28,6 +28,7 @@ module.exports = {
         "react/no-unescaped-entities": 0,
         "react/jsx-props-no-spreading": 0,
         "react/require-default-props": 0,
+        "react/no-array-index-key": 0,
         "import/extensions": 0,
         "import/no-unresolved": 0,
         "import/prefer-default-export": 0,
