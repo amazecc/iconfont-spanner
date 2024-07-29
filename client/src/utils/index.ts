@@ -11,3 +11,6 @@ export const findDuplicates = (arr: string[]) => {
     });
     return duplicates;
 };
+
+/** 合规字体名称 */
+export const isValidFontName = (name: string) => /^[a-zA-Z][a-zA-Z-_\d]+$/.test(name);

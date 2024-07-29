@@ -8,6 +8,10 @@ import { walkFileSync, getTypeDeclarationString, getCssString, optimizeSvgString
 import type { FontManagerOption, OutputFile, FontMetadata, SvgComponentMetadata, ComponentOption } from "./type";
 
 export class FontManager {
+    static isValidName(name: string) {
+        return /^[a-zA-Z][a-zA-Z-_\d]+$/.test(name);
+    }
+
     /** 构造函数配置项 */
     readonly option: FontManagerOption;
 

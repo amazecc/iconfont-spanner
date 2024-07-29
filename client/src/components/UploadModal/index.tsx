@@ -1,10 +1,12 @@
 import React, { useEffect } from "react";
 import { message, Modal } from "antd";
+import classnames from "classnames";
 import { FilePicker } from "../basic/FilePicker";
 import { addIcon } from "src/api/addIcon";
 import { useSetState } from "ahooks";
 import { EditableText } from "../basic/EditableText";
-import { findDuplicates } from "src/utils";
+import { findDuplicates, isValidFontName } from "src/utils";
+import { CloseCircleOutlined, EditOutlined } from "@ant-design/icons";
 
 export interface UploadModalProps {
     open?: boolean;
@@ -26,17 +28,21 @@ const readAsString = async (file: File) => {
 interface State {
     files: { name: string; svg: string }[];
     repeatNames: string[];
+    invalidNames: string[];
     names: string[];
 }
 
 export const UploadModal: React.FC<UploadModalProps> = React.memo(({ open, onClose, onSuccess }) => {
-    const [{ files, repeatNames, names }, setState] = useSetState<State>({ files: [], repeatNames: [], names: [] });
+    const [{ files, repeatNames, invalidNames, names }, setState] = useSetState<State>({ files: [], repeatNames: [], names: [], invalidNames: [] });
 
     useEffect(() => {
-        setState({ repeatNames: findDuplicates([...files.map(item => item.name), ...names]) }); // 计算重复的名字
+        setState({
+            repeatNames: findDuplicates([...files.map(item => item.name), ...names]), // 计算重复的名字
+            invalidNames: files.filter(item => !isValidFontName(item.name)).map(item => item.name), // 计算不合规名字
+        });
     }, [files, names, setState]);
 
-    const changeSize = (svg: string) => svg.replace(/(?<=(?:\s(?:width)|(?:height))=["'])[\d\w.]+/g, "40px");
+    const changeSize = (svg: string) => svg.replace(/(?<=(?:\s(?:width)|(?:height))=["'])[\d\w.]+/g, "44px");
 
     const onChange = async (fileList: File[]) => {
         const selectFiles = await Promise.all(
@@ -63,8 +69,8 @@ export const UploadModal: React.FC<UploadModalProps> = React.memo(({ open, onClo
     };
 
     const submit = async () => {
-        if (repeatNames.length) {
-            message.warning("请处理修改重复名称");
+        if (repeatNames.length || invalidNames.length) {
+            message.warning("请修改重复或不合规名称的图标");
             return;
         }
         const result = await addIcon({ data: files });
@@ -81,40 +87,72 @@ export const UploadModal: React.FC<UploadModalProps> = React.memo(({ open, onClo
     };
 
     return (
-        <Modal width={800} title="选择文件/文件夹" open={open} onCancel={onClose} onOk={submit} afterClose={reset}>
-            <FilePicker dirDrop className="flex h-14 cursor-pointer items-center justify-center rounded border border-dashed bg-gray-100 transition-all hover:border-blue-600" onSelect={onChange}>
-                <p className="ant-upload-text select-none text-gray-500">点击选择文件，支持多选与拖入文件夹</p>
+        <Modal width={700} title="选择文件/文件夹" open={open} onCancel={onClose} onOk={submit} afterClose={reset}>
+            <FilePicker dirDrop className="flex h-16 cursor-pointer items-center justify-center rounded border border-dashed bg-gray-100 transition-all hover:border-blue-600" onSelect={onChange}>
+                <p className="ant-upload-text pointer-events-none select-none text-gray-500">点击选择文件，支持多选与拖入文件夹</p>
             </FilePicker>
 
             {files.length > 0 && (
-                <div className="mt-5 grid grid-cols-4 gap-3">
-                    {files.map((file, index) => {
-                        const isRepeat = repeatNames.includes(file.name);
-                        return (
-                            <div key={`${file.name}_${index}`} className={`flex flex-col items-center justify-start p-2 ${isRepeat ? "bg-red-300" : ""}`}>
-                                <span dangerouslySetInnerHTML={{ __html: file.svg }} />
-                                <EditableText
-                                    onConfirm={async value => {
-                                        if (value) {
-                                            setState({
-                                                files: files.map((_, i) => (i === index ? { ..._, name: value } : _)),
-                                            });
-                                        }
-                                        return false;
-                                    }}
-                                >
-                                    {start => (
-                                        <p className="text-sm leading-6" onDoubleClick={() => start(file.name)}>
-                                            {file.name}
-                                        </p>
+                <div>
+                    <div className="mt-5 flex justify-center gap-3">
+                        <span className="flex items-center text-xs text-gray-700">
+                            <span className="mr-1 h-[1em] w-[1em] bg-purple-200" />
+                            重复&不合规
+                        </span>
+                        <span className="flex items-center text-xs text-gray-700">
+                            <span className="mr-1 h-[1em] w-[1em] bg-amber-200" />
+                            重复
+                        </span>
+                        <span className="flex items-center text-xs text-gray-700">
+                            <span className="mr-1 h-[1em] w-[1em] bg-red-200" />
+                            不合规
+                        </span>
+                        <span className="ml-auto text-xs text-gray-400">合规：图标名称必须以字母开头，只能包含字母、下划线和中划线</span>
+                    </div>
+
+                    <div className="mt-5 grid grid-cols-3 gap-3">
+                        {files.map((file, index) => {
+                            const isRepeat = repeatNames.includes(file.name);
+                            const isInvalid = invalidNames.includes(file.name);
+                            return (
+                                <div
+                                    key={`${file.name}_${index}`}
+                                    className={classnames(
+                                        "group relative box-border flex flex-col items-center justify-start rounded-md border border-dashed border-transparent px-1 py-5  transition-all hover:border-blue-600",
+                                        `${isRepeat && isInvalid ? "bg-purple-200" : isRepeat ? "bg-amber-200" : isInvalid ? "bg-red-200" : ""}`,
                                     )}
-                                </EditableText>
-                                <span className="text-xs text-red-700" onClick={() => remove(index)}>
-                                    移除
-                                </span>
-                            </div>
-                        );
-                    })}
+                                >
+                                    <span dangerouslySetInnerHTML={{ __html: file.svg }} />
+                                    <EditableText
+                                        onConfirm={async value => {
+                                            if (value) {
+                                                setState({
+                                                    files: files.map((_, i) => (i === index ? { ..._, name: value } : _)),
+                                                });
+                                            }
+                                            return false;
+                                        }}
+                                    >
+                                        {start => (
+                                            <>
+                                                <p className="text-sm leading-6" onDoubleClick={() => start(file.name)}>
+                                                    {file.name}
+                                                </p>
+                                                <div className="absolute right-1 top-1 hidden gap-4 leading-none group-hover:flex">
+                                                    <span className="cursor-pointer hover:text-blue-600" onClick={() => start(file.name)}>
+                                                        <EditOutlined />
+                                                    </span>
+                                                    <span className="cursor-pointer hover:text-blue-600" onClick={() => remove(index)}>
+                                                        <CloseCircleOutlined />
+                                                    </span>
+                                                </div>
+                                            </>
+                                        )}
+                                    </EditableText>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             )}
         </Modal>

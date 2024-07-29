@@ -1,6 +1,8 @@
 import React, { useEffect, Suspense, lazy } from "react";
 import ReactDOM from "react-dom/client";
-import { Button } from "antd";
+import dayjs from "dayjs";
+import { Button, ConfigProvider } from "antd";
+import zhCN from "antd/locale/zh_CN";
 import { getIconList, type FontData } from "./api/getIconList";
 import { renameIcon } from "./api/renameIcon";
 import { removeIcon } from "./api/removeIcon";
@@ -10,6 +12,8 @@ import { IconArea } from "./font/react-components/IconArea";
 import "./globals.css";
 import { UploadModal } from "./components/UploadModal";
 import { useBoolean } from "ahooks";
+
+dayjs.locale("zh-cn");
 
 const SvgIconGrid = lazy(() => import("./components/SvgIconGrid"));
 const FontIconGrid = lazy(() => import("./components/FontIconGrid"));
@@ -64,41 +68,43 @@ const App = () => {
     }, []);
 
     return (
-        <Suspense>
-            <div className="mx-auto max-w-screen-lg">
-                <div className="flex items-center justify-between">
-                    <h1 className="my-5 text-4xl font-bold">
-                        预览
-                        <IconArea />
-                        <span className="iconfont icon-color_oc" />
-                    </h1>
-                    <Button type="primary" onClick={scan}>
-                        扫描
-                    </Button>
-                    <Button type="primary" onClick={setTrue}>
-                        上传
-                    </Button>
-                    <Button type="primary" onClick={generate}>
-                        生成字体
-                    </Button>
+        <ConfigProvider locale={zhCN}>
+            <Suspense>
+                <div className="mx-auto max-w-screen-lg">
+                    <div className="flex items-center justify-between">
+                        <h1 className="my-5 text-4xl font-bold">
+                            预览
+                            <IconArea />
+                            <span className="iconfont icon-color_oc" />
+                        </h1>
+                        <Button type="primary" onClick={scan}>
+                            扫描
+                        </Button>
+                        <Button type="primary" onClick={setTrue}>
+                            上传
+                        </Button>
+                        <Button type="primary" onClick={generate}>
+                            生成字体
+                        </Button>
+                    </div>
+
+                    {component && (
+                        <>
+                            <h2 className="my-5 text-2xl font-bold">SVG 组件</h2>
+                            <SvgIconGrid usage={usage?.component} metadata={component.metadata} onRemove={remove} onRename={rename} />
+                        </>
+                    )}
+
+                    {font && (
+                        <>
+                            <h2 className="my-5 text-2xl font-bold">字体图标</h2>
+                            <FontIconGrid usage={usage?.font} metadata={font.metadata} onRemove={remove} onRename={rename} />
+                        </>
+                    )}
+                    <UploadModal open={open} onClose={setFalse} onSuccess={fetchList} />
                 </div>
-
-                {component && (
-                    <>
-                        <h2 className="my-5 text-2xl font-bold">SVG 组件</h2>
-                        <SvgIconGrid usage={usage?.component} metadata={component.metadata} onRemove={remove} onRename={rename} />
-                    </>
-                )}
-
-                {font && (
-                    <>
-                        <h2 className="my-5 text-2xl font-bold">字体图标</h2>
-                        <FontIconGrid usage={usage?.font} metadata={font.metadata} onRemove={remove} onRename={rename} />
-                    </>
-                )}
-                <UploadModal open={open} onClose={setFalse} onSuccess={fetchList} />
-            </div>
-        </Suspense>
+            </Suspense>
+        </ConfigProvider>
     );
 };
 

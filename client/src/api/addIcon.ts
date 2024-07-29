@@ -7,6 +7,7 @@ export type AddIconResponse =
     | {
           names: string[];
           repeatNames: string[];
+          invalidNames: string[];
       }
     | undefined;
 

@@ -40,17 +40,17 @@ router.post("/api/generate", async ctx => {
 
 router.post("/api/rename", async ctx => {
     const { oldName, newName } = ctx.request.body;
-    if (/^[a-zA-Z-_]+$/.test(newName)) {
+    if (FontManager.isValidName(newName)) {
         const oldPath = await getSvgFilePathByName(oldName);
         if (oldPath) {
             const newPath = oldPath.replace(`${oldName}.svg`, `${newName}.svg`);
             await renameFile(oldPath, newPath);
             ctx.body = { success: true };
         } else {
-            ctx.body = { success: false, message: "该原始文件不存在，请刷新页面" };
+            ctx.body = { success: false, message: "该原始文件不存在，请刷新页面获取最新组件列表" };
         }
     } else {
-        ctx.body = { success: false, message: "名称只能包含字母、下划线和中划线" };
+        ctx.body = { success: false, message: "名称必须以字母开头，只能包含字母、下划线和中划线" };
     }
 });
 
@@ -71,12 +71,14 @@ router.post("/api/add", async ctx => {
     const data = ctx.request.body.data as AddData;
     const fileNames = await getSvgFileNames();
     const repeatNames = findDuplicates(data.map(item => item.name).concat(fileNames));
-    if (repeatNames.length > 0) {
+    const invalidNames = data.filter(item => !FontManager.isValidName(item.name));
+    if (repeatNames.length > 0 || invalidNames.length > 0) {
         ctx.body = {
             success: true,
             data: {
                 names: fileNames,
                 repeatNames,
+                invalidNames,
             },
         };
     } else {
