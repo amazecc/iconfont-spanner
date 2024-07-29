@@ -36,7 +36,7 @@ export const UploadModal: React.FC<UploadModalProps> = React.memo(({ open, onClo
         setState({ repeatNames: findDuplicates([...files.map(item => item.name), ...names]) }); // 计算重复的名字
     }, [files, names, setState]);
 
-    const changeSize = (svg: string) => svg.replace(/(?<=(?:\s(?:width)|(?:height))=["'])[\d\w]+/g, "40px");
+    const changeSize = (svg: string) => svg.replace(/(?<=(?:\s(?:width)|(?:height))=["'])[\d\w.]+/g, "40px");
 
     const onChange = async (fileList: File[]) => {
         const selectFiles = await Promise.all(
