@@ -1,12 +1,10 @@
 import React, { useEffect } from "react";
 import { message, Modal } from "antd";
-import classnames from "classnames";
 import { FilePicker } from "../basic/FilePicker";
 import { addIcon } from "src/api/addIcon";
 import { useSetState } from "ahooks";
-import { EditableText } from "../basic/EditableText";
 import { findDuplicates, isValidFontName } from "src/utils";
-import { CloseCircleOutlined, EditOutlined } from "@ant-design/icons";
+import { FontCard } from "../FontCard";
 
 export interface UploadModalProps {
     open?: boolean;
@@ -107,7 +105,7 @@ export const UploadModal: React.FC<UploadModalProps> = React.memo(({ open, onClo
                             <span className="mr-1 h-[1em] w-[1em] bg-red-200" />
                             不合规
                         </span>
-                        <span className="ml-auto text-xs text-gray-400">合规：图标名称必须以字母开头，只能包含字母、下划线和中划线</span>
+                        <span className="ml-auto text-xs text-gray-400">合规：图标名称必须以字母开头，只能包含字母、数字、下划线和中划线</span>
                     </div>
 
                     <div className="mt-5 grid grid-cols-3 gap-3">
@@ -115,41 +113,18 @@ export const UploadModal: React.FC<UploadModalProps> = React.memo(({ open, onClo
                             const isRepeat = repeatNames.includes(file.name);
                             const isInvalid = invalidNames.includes(file.name);
                             return (
-                                <div
+                                <FontCard
                                     key={`${file.name}_${index}`}
-                                    className={classnames(
-                                        "group relative box-border flex flex-col items-center justify-start rounded-md border border-dashed border-transparent px-1 py-5  transition-all hover:border-blue-600",
-                                        `${isRepeat && isInvalid ? "bg-purple-200" : isRepeat ? "bg-amber-200" : isInvalid ? "bg-red-200" : ""}`,
-                                    )}
-                                >
-                                    <span dangerouslySetInnerHTML={{ __html: file.svg }} />
-                                    <EditableText
-                                        onConfirm={async value => {
-                                            if (value) {
-                                                setState({
-                                                    files: files.map((_, i) => (i === index ? { ..._, name: value } : _)),
-                                                });
-                                            }
-                                            return false;
-                                        }}
-                                    >
-                                        {start => (
-                                            <>
-                                                <p className="text-sm leading-6" onDoubleClick={() => start(file.name)}>
-                                                    {file.name}
-                                                </p>
-                                                <div className="absolute right-1 top-1 hidden gap-4 leading-none group-hover:flex">
-                                                    <span className="cursor-pointer hover:text-blue-600" onClick={() => start(file.name)}>
-                                                        <EditOutlined />
-                                                    </span>
-                                                    <span className="cursor-pointer hover:text-blue-600" onClick={() => remove(index)}>
-                                                        <CloseCircleOutlined />
-                                                    </span>
-                                                </div>
-                                            </>
-                                        )}
-                                    </EditableText>
-                                </div>
+                                    className={isRepeat && isInvalid ? "bg-purple-200" : isRepeat ? "bg-amber-200" : isInvalid ? "bg-red-200" : ""}
+                                    name={file.name}
+                                    icon={<span dangerouslySetInnerHTML={{ __html: file.svg }} />}
+                                    onClickRemove={() => remove(index)}
+                                    onEditConfirm={value => {
+                                        setState({
+                                            files: files.map((_, i) => (i === index ? { ..._, name: value } : _)),
+                                        });
+                                    }}
+                                />
                             );
                         })}
                     </div>

@@ -1,17 +1,17 @@
 import React, { useEffect, Suspense, lazy } from "react";
 import ReactDOM from "react-dom/client";
 import dayjs from "dayjs";
-import { Button, ConfigProvider } from "antd";
+import { Button, ConfigProvider, message, Modal, Popover, Tabs } from "antd";
+import { PlusOutlined, RadarChartOutlined, RetweetOutlined, SyncOutlined } from "@ant-design/icons";
+import { useBoolean } from "ahooks";
 import zhCN from "antd/locale/zh_CN";
 import { getIconList, type FontData } from "./api/getIconList";
 import { renameIcon } from "./api/renameIcon";
 import { removeIcon } from "./api/removeIcon";
 import { generateIcon } from "./api/generateIcon";
 import { scanIcon, type FontUsage } from "./api/scanIcon";
-import { IconArea } from "./font/react-components/IconArea";
-import "./globals.css";
 import { UploadModal } from "./components/UploadModal";
-import { useBoolean } from "ahooks";
+import "./globals.css";
 
 dayjs.locale("zh-cn");
 
@@ -31,20 +31,24 @@ const App = () => {
         renameIcon(oldName, newName)
             .then(fetchList)
             .catch(err => {
-                alert(err.message);
+                message.error(err.message);
             });
     };
 
     const remove = (name: string) => {
         if (!usage) {
-            alert("删除前请进行扫描图标，检查使用情况！");
+            message.warning("删除前请进行扫描图标，检查使用情况！");
             return;
         }
         const usedInFont = usage.font?.used.some(used => used === name);
         const usedInSvg = usage.component?.used.some(used => used === name);
-        if (window.confirm(["确认删除图标吗？", usedInFont || usedInSvg ? "该图标已被使用！" : ""].join(""))) {
-            removeIcon(name).then(fetchList);
-        }
+        Modal.confirm({
+            title: "提示",
+            content: ["确认删除图标吗？", usedInFont || usedInSvg ? "该图标已被使用！" : ""].join(""),
+            onOk() {
+                removeIcon(name).then(fetchList);
+            },
+        });
     };
 
     const generate = () => {
@@ -59,7 +63,7 @@ const App = () => {
                 setUsage(res);
             })
             .catch(error => {
-                alert(error.message);
+                message.error(error.message);
             });
     };
 
@@ -70,37 +74,56 @@ const App = () => {
     return (
         <ConfigProvider locale={zhCN}>
             <Suspense>
-                <div className="mx-auto max-w-screen-lg">
-                    <div className="flex items-center justify-between">
-                        <h1 className="my-5 text-4xl font-bold">
-                            预览
-                            <IconArea />
-                            <span className="iconfont icon-color_oc" />
-                        </h1>
-                        <Button type="primary" onClick={scan}>
-                            扫描
-                        </Button>
-                        <Button type="primary" onClick={setTrue}>
-                            上传
-                        </Button>
-                        <Button type="primary" onClick={generate}>
-                            生成字体
-                        </Button>
-                    </div>
+                <div className="mx-auto max-w-screen-lg pt-14">
+                    <Tabs
+                        type="card"
+                        items={[
+                            !!font && {
+                                label: "Font Class",
+                                key: "font",
+                                children: <FontIconGrid usage={usage?.font} metadata={font.metadata} onRemove={remove} onRename={rename} />,
+                            },
+                            !!component && {
+                                label: "SVG Component",
+                                key: "svg",
+                                children: <SvgIconGrid usage={usage?.component} metadata={component.metadata} onRemove={remove} onRename={rename} />,
+                            },
+                        ].filter(item => item !== false)}
+                        tabBarExtraContent={{
+                            right: (
+                                <div className="flex gap-4">
+                                    <Button
+                                        icon={<SyncOutlined />}
+                                        type="primary"
+                                        onClick={() => {
+                                            fetchList();
+                                        }}
+                                    >
+                                        刷新
+                                    </Button>
+                                    <Popover
+                                        content={
+                                            <span className="flex items-center text-xs text-gray-700">
+                                                <span className="mr-1 h-[1em] w-[1em] bg-slate-200" />
+                                                未使用
+                                            </span>
+                                        }
+                                    >
+                                        <Button icon={<RadarChartOutlined />} type="primary" onClick={scan}>
+                                            扫描
+                                        </Button>
+                                    </Popover>
 
-                    {component && (
-                        <>
-                            <h2 className="my-5 text-2xl font-bold">SVG 组件</h2>
-                            <SvgIconGrid usage={usage?.component} metadata={component.metadata} onRemove={remove} onRename={rename} />
-                        </>
-                    )}
-
-                    {font && (
-                        <>
-                            <h2 className="my-5 text-2xl font-bold">字体图标</h2>
-                            <FontIconGrid usage={usage?.font} metadata={font.metadata} onRemove={remove} onRename={rename} />
-                        </>
-                    )}
+                                    <Button icon={<PlusOutlined />} type="primary" onClick={setTrue}>
+                                        添加
+                                    </Button>
+                                    <Button icon={<RetweetOutlined />} type="primary" onClick={generate}>
+                                        转化
+                                    </Button>
+                                </div>
+                            ),
+                        }}
+                    />
                     <UploadModal open={open} onClose={setFalse} onSuccess={fetchList} />
                 </div>
             </Suspense>

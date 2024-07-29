@@ -1,27 +1,31 @@
 import React from "react";
+import classnames from "classnames";
 import type { SvgComponentMetadata } from "server/utils/FontManager/type";
-import { SvgIconCard, type SvgIconCardProps } from "./SvgIconCard";
 import { type FontUsage } from "../../api/scanIcon";
+import { FontCard } from "../FontCard";
 
-export interface SvgIconGridProps extends Pick<SvgIconCardProps, "onRemove" | "onRename"> {
+export interface SvgIconGridProps {
     metadata: SvgComponentMetadata[];
     usage?: FontUsage["component"];
+    onRename?: (oldName: string, newName: string) => void;
+    onRemove?: (name: string) => void;
 }
 
 const SvgIconGrid: React.FC<SvgIconGridProps> = React.memo(({ metadata, usage, onRemove, onRename }) => {
-    const usedIconName = React.useMemo(() => new Set(usage?.used), [usage]);
     const unusedIconName = React.useMemo(() => new Set(usage?.unused), [usage]);
 
     return (
-        <div className=" grid grid-cols-8 gap-3">
+        <div className=" grid grid-cols-6 gap-3">
             {metadata.map(item => {
                 return (
-                    <SvgIconCard
-                        useType={usedIconName.has(item.fileName) ? "used" : unusedIconName.has(item.fileName) ? "unused" : undefined}
+                    <FontCard
                         key={item.fileName}
-                        data={item}
-                        onRemove={onRemove}
-                        onRename={onRename}
+                        className={classnames(unusedIconName.has(item.fileName) && "bg-slate-200")}
+                        name={item.fileName}
+                        subName={item.name}
+                        icon={<span className="text-[52px] leading-none" dangerouslySetInnerHTML={{ __html: item.svgOptimizeString }} />}
+                        onClickRemove={() => onRemove?.(item.fileName)}
+                        onEditConfirm={value => onRename?.(item.fileName, value)}
                     />
                 );
             })}

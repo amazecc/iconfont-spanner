@@ -50,7 +50,7 @@ router.post("/api/rename", async ctx => {
             ctx.body = { success: false, message: "该原始文件不存在，请刷新页面获取最新组件列表" };
         }
     } else {
-        ctx.body = { success: false, message: "名称必须以字母开头，只能包含字母、下划线和中划线" };
+        ctx.body = { success: false, message: "名称必须以字母开头，只能包含字母、数字、下划线和中划线" };
     }
 });
 
