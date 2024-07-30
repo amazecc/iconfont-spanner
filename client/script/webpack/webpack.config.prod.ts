@@ -1,4 +1,3 @@
-import path from "path";
 import merge from "webpack-merge";
 import { Configuration, DefinePlugin } from "webpack";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
@@ -48,9 +47,7 @@ const config: Configuration = merge(common, {
         new DefinePlugin({
             IS_DEV: JSON.stringify(false),
         }),
-        new CleanWebpackPlugin({
-            cleanOnceBeforeBuildPatterns: [path.resolve(__dirname, "../../out/static")],
-        }),
+        new CleanWebpackPlugin(),
         new MiniCssExtractPlugin({
             filename: `${version}/css/[name].[contenthash:8].css`,
             chunkFilename: `${version}/css/[name].[contenthash:8].chunk.css`,
