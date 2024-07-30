@@ -11,6 +11,7 @@ import { removeIcon } from "./api/removeIcon";
 import { generateIcon } from "./api/generateIcon";
 import { scanIcon, type FontUsage } from "./api/scanIcon";
 import { UploadModal } from "./components/UploadModal";
+import { AutoLoadingButton } from "./components/basic/AutoLoadingButton";
 import "./globals.css";
 
 dayjs.locale("zh-cn");
@@ -57,8 +58,8 @@ const App = () => {
         });
     };
 
-    const scan = () => {
-        scanIcon()
+    const scan = async () => {
+        return scanIcon()
             .then(res => {
                 setUsage(res);
             })
@@ -109,9 +110,9 @@ const App = () => {
                                             </span>
                                         }
                                     >
-                                        <Button icon={<RadarChartOutlined />} type="primary" onClick={scan}>
+                                        <AutoLoadingButton icon={<RadarChartOutlined />} type="primary" onClick={scan}>
                                             扫描
-                                        </Button>
+                                        </AutoLoadingButton>
                                     </Popover>
 
                                     <Button icon={<PlusOutlined />} type="primary" onClick={setTrue}>
