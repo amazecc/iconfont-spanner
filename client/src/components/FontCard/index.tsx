@@ -18,7 +18,7 @@ export const FontCard: React.FC<FontCardProps> = React.memo(props => {
     return (
         <div
             className={classnames(
-                "group relative box-border flex flex-col items-center justify-start rounded-md border border-dashed border-transparent px-1 py-5  transition-all hover:border-blue-600",
+                "group relative box-border flex flex-col items-center justify-start rounded-md border border-dashed border-transparent px-1 py-6  transition-all hover:border-blue-600",
                 className,
             )}
             style={style}
@@ -38,7 +38,7 @@ export const FontCard: React.FC<FontCardProps> = React.memo(props => {
                             {name}
                         </span>
                         {subName ? <span className="text-sm leading-6">{subName}</span> : null}
-                        <div className="absolute right-1 top-1 hidden gap-4 leading-none group-hover:flex">
+                        <div className="absolute right-1 top-1 hidden gap-4 text-base !leading-none group-hover:flex">
                             <span className="cursor-pointer hover:text-blue-600" onClick={() => start(name)}>
                                 <EditOutlined />
                             </span>

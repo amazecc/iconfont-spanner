@@ -1,7 +1,7 @@
 import React, { useEffect, Suspense, lazy } from "react";
 import ReactDOM from "react-dom/client";
 import dayjs from "dayjs";
-import { Button, ConfigProvider, message, Modal, Popover, Tabs } from "antd";
+import { Button, ConfigProvider, message, Modal, Popover, Tabs, Typography } from "antd";
 import { PlusOutlined, RadarChartOutlined, RetweetOutlined, SyncOutlined } from "@ant-design/icons";
 import { useBoolean } from "ahooks";
 import zhCN from "antd/locale/zh_CN";
@@ -74,7 +74,13 @@ const App = () => {
     return (
         <ConfigProvider locale={zhCN}>
             <Suspense>
-                <div className="mx-auto max-w-screen-lg pt-14">
+                <div className="mx-auto max-w-screen-lg pb-11">
+                    <div className="flex flex-col justify-center py-3">
+                        <Typography.Title level={5}>说明：</Typography.Title>
+                        <Typography.Text type="secondary">1. 添加图标两种方式：1）将 svg 文件放入配置文件的 resourceDir 目录中；2）点击【上传】按钮</Typography.Text>
+                        <Typography.Text type="secondary">3. 每次编辑图标后，如添加，删除，修改名称后，都需要点击【转化】按钮重新生成可直接使用的资源</Typography.Text>
+                        <Typography.Text type="secondary">2. 删除前，请点击【扫描】，检查图标使用情况，灰色为未使用图标（若项目文件过多，扫描过程可能比较久，耐心等待）</Typography.Text>
+                    </div>
                     <Tabs
                         type="card"
                         items={[

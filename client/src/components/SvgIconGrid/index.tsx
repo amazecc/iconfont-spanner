@@ -3,6 +3,7 @@ import classnames from "classnames";
 import type { SvgComponentMetadata } from "server/utils/FontManager/type";
 import { type FontUsage } from "../../api/scanIcon";
 import { FontCard } from "../FontCard";
+import { message } from "antd";
 
 export interface SvgIconGridProps {
     metadata: SvgComponentMetadata[];
@@ -23,7 +24,17 @@ const SvgIconGrid: React.FC<SvgIconGridProps> = React.memo(({ metadata, usage, o
                         className={classnames(unusedIconName.has(item.fileName) && "bg-slate-200")}
                         name={item.fileName}
                         subName={item.name}
-                        icon={<span className="text-[52px] leading-none" dangerouslySetInnerHTML={{ __html: item.svgOptimizeString }} />}
+                        icon={
+                            <span
+                                className="text-[52px] leading-none"
+                                dangerouslySetInnerHTML={{ __html: item.svgOptimizeString }}
+                                onClick={() => {
+                                    navigator.clipboard.writeText(`<${item.name} />`).then(() => {
+                                        message.success("已复制到剪贴板");
+                                    });
+                                }}
+                            />
+                        }
                         onClickRemove={() => onRemove?.(item.fileName)}
                         onEditConfirm={value => onRename?.(item.fileName, value)}
                     />

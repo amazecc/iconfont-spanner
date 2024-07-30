@@ -4,6 +4,7 @@ import type { FontMetadata } from "server/utils/FontManager/type";
 import { type FontUsage } from "../../api/scanIcon";
 import { FontStyle } from "./FontStyle";
 import { FontCard } from "../FontCard";
+import { message } from "antd";
 
 export interface FontIconGridProps {
     metadata: FontMetadata[];
@@ -25,7 +26,16 @@ const FontIconGrid: React.FC<FontIconGridProps> = React.memo(({ metadata, usage,
                             key={item.fileName}
                             className={classnames(unusedIconName.has(item.fileName) && "bg-slate-200")}
                             name={item.fileName}
-                            icon={<span className={`iconfont text-[52px] leading-none ${item.fileName}`} />}
+                            icon={
+                                <span
+                                    className={`iconfont text-[52px] leading-none ${item.fileName}`}
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(item.fileName).then(() => {
+                                            message.success("已复制到剪贴板");
+                                        });
+                                    }}
+                                />
+                            }
                             onClickRemove={() => onRemove?.(item.fileName)}
                             onEditConfirm={value => onRename?.(item.fileName, value)}
                         />
