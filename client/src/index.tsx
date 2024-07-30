@@ -52,10 +52,9 @@ const App = () => {
         });
     };
 
-    const generate = () => {
-        generateIcon().then(() => {
-            alert("生成成功");
-        });
+    const generate = async () => {
+        await generateIcon();
+        message.success("生成成功！");
     };
 
     const scan = async () => {
@@ -93,15 +92,9 @@ const App = () => {
                         tabBarExtraContent={{
                             right: (
                                 <div className="flex gap-4">
-                                    <Button
-                                        icon={<SyncOutlined />}
-                                        type="primary"
-                                        onClick={() => {
-                                            fetchList();
-                                        }}
-                                    >
+                                    <AutoLoadingButton icon={<SyncOutlined />} type="primary" onClick={fetchList}>
                                         刷新
-                                    </Button>
+                                    </AutoLoadingButton>
                                     <Popover
                                         content={
                                             <span className="flex items-center text-xs text-gray-700">
@@ -118,9 +111,9 @@ const App = () => {
                                     <Button icon={<PlusOutlined />} type="primary" onClick={setTrue}>
                                         添加
                                     </Button>
-                                    <Button icon={<RetweetOutlined />} type="primary" onClick={generate}>
+                                    <AutoLoadingButton icon={<RetweetOutlined />} type="primary" onClick={generate}>
                                         转化
-                                    </Button>
+                                    </AutoLoadingButton>
                                 </div>
                             ),
                         }}
