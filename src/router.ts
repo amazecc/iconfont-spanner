@@ -3,9 +3,9 @@ import path from "path";
 import { glob } from "glob";
 import Router from "@koa/router";
 import { FontManager } from "./utils/FontManager";
-import { getSvgFileNames, getSvgFilePathByName, importConfig, renameFile } from "./utils";
+import { getSvgFilePathByName, importConfig, renameFile } from "./utils";
 import { CodeScanner } from "./utils/CodeScanner";
-import { findDuplicates } from "./utils/FontManager/utils";
+import { findRepeat, scanSvgFilePaths } from "./utils/FontManager/utils";
 
 const router = new Router();
 
@@ -40,7 +40,7 @@ router.post("/api/generate", async ctx => {
 
 router.post("/api/rename", async ctx => {
     const { oldName, newName } = ctx.request.body;
-    if (FontManager.isValidName(newName)) {
+    if (FontManager.isValidFileName(newName)) {
         const oldPath = await getSvgFilePathByName(oldName);
         if (oldPath) {
             const newPath = oldPath.replace(`${oldName}.svg`, `${newName}.svg`);
@@ -69,9 +69,9 @@ type AddData = { name: string; svg: string }[];
 router.post("/api/add", async ctx => {
     const config = await importConfig();
     const data = ctx.request.body.data as AddData;
-    const fileNames = await getSvgFileNames();
-    const repeatNames = findDuplicates(data.map(item => item.name).concat(fileNames));
-    const invalidNames = data.filter(item => !FontManager.isValidName(item.name));
+    const fileNames = scanSvgFilePaths(config.resourceDir).map(filePath => path.basename(filePath, ".svg"));
+    const repeatNames = findRepeat(data.map(item => item.name).concat(fileNames));
+    const invalidNames = data.filter(item => !FontManager.isValidFileName(item.name));
     if (repeatNames.length > 0 || invalidNames.length > 0) {
         ctx.body = {
             success: true,

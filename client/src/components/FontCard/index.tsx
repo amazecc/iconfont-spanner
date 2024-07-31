@@ -34,7 +34,7 @@ export const FontCard: React.FC<FontCardProps> = React.memo(props => {
             >
                 {start => (
                     <>
-                        <span className="text-sm leading-6" onDoubleClick={() => start(name)}>
+                        <span className="break-all text-center text-sm leading-6" onDoubleClick={() => start(name)}>
                             {name}
                         </span>
                         {subName ? <span className="text-sm leading-6">{subName}</span> : null}

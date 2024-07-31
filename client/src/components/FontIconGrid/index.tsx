@@ -15,6 +15,7 @@ export interface FontIconGridProps {
 
 const FontIconGrid: React.FC<FontIconGridProps> = React.memo(({ metadata, usage, onRemove, onRename }) => {
     const unusedIconName = React.useMemo(() => new Set(usage?.unused), [usage]);
+    const usedIconName = React.useMemo(() => new Set(usage?.used), [usage]);
 
     return (
         <>
@@ -24,11 +25,11 @@ const FontIconGrid: React.FC<FontIconGridProps> = React.memo(({ metadata, usage,
                     return (
                         <FontCard
                             key={item.fileName}
-                            className={classnames(unusedIconName.has(item.fileName) && "bg-slate-200")}
+                            className={classnames(unusedIconName.has(item.fileName) && "bg-slate-200", usedIconName.has(item.fileName) && "bg-green-200")}
                             name={item.fileName}
                             icon={
                                 <span
-                                    className={`iconfont text-[52px] leading-none ${item.fileName}`}
+                                    className={`iconfont cursor-copy text-[52px] leading-none ${item.fileName}`}
                                     onClick={() => {
                                         navigator.clipboard.writeText(item.fileName).then(() => {
                                             message.success("已复制到剪贴板");

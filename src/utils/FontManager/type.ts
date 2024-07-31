@@ -25,7 +25,7 @@ export interface FontManagerOption {
 
 export interface ComponentOption {
     /** 组件放置的文件夹, 相对于 output.dir 的相对路径 */
-    dir: string;
+    dir?: string;
     /** 组件文件名，需要带上后缀，比如：Demo.tsx */
     fileName: (fileName: string) => string;
     /** 组件名 */
@@ -39,9 +39,16 @@ export interface ComponentOption {
     fillCurrentColor?: boolean | ((fileName: string) => boolean);
 }
 
+export type FontType = "ttf" | "woff" | "woff2";
+
 export interface FontOption {
     /** 字体名称 */
     name: string;
+    /**
+     * 生成的字体类型
+     * @default ["ttf", "woff", "woff2"]
+     */
+    types?: FontType[];
     /** 针对生成文件内容进行格式化 */
     format?: (content: string, type: "css" | "typescript") => string | Promise<string>;
 }

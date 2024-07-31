@@ -54,6 +54,7 @@ export const FilePicker = <M extends boolean = false>(props: FilePickerProps<M>)
                     const files = Array.from(e.target.files ?? []);
                     if (files.length) {
                         onSelectMemo((isMultiple ? files : files[0]) as IsArray<M, File>);
+                        e.target.value = ""; // 置空，下次选择同样的文件，则重新触发 onChange
                     }
                 }}
             />

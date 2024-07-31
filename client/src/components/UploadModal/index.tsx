@@ -85,7 +85,7 @@ export const UploadModal: React.FC<UploadModalProps> = React.memo(({ open, onClo
     };
 
     return (
-        <Modal width={700} title="选择文件/文件夹" open={open} onCancel={onClose} onOk={submit} afterClose={reset}>
+        <Modal width={740} title="选择文件/文件夹" open={open} onCancel={onClose} onOk={submit} afterClose={reset}>
             <FilePicker dirDrop className="flex h-16 cursor-pointer items-center justify-center rounded border border-dashed bg-gray-100 transition-all hover:border-blue-600" onSelect={onChange}>
                 <p className="ant-upload-text pointer-events-none select-none text-gray-500">点击选择文件，支持多选与拖入文件夹</p>
             </FilePicker>
@@ -108,7 +108,7 @@ export const UploadModal: React.FC<UploadModalProps> = React.memo(({ open, onClo
                         <span className="ml-auto text-xs text-gray-400">合规：图标名称必须以字母开头，只能包含字母、数字、下划线和中划线</span>
                     </div>
 
-                    <div className="mt-5 grid grid-cols-3 gap-3">
+                    <div className="mt-5 grid grid-cols-4 gap-2">
                         {files.map((file, index) => {
                             const isRepeat = repeatNames.includes(file.name);
                             const isInvalid = invalidNames.includes(file.name);

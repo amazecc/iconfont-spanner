@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import { optimize } from "svgo";
-import type { FontMetadata, ComponentOption } from "./type";
+import type { FontMetadata, ComponentOption, FontType } from "./type";
 
 // ********************************************** node 工具函数 ***********************************************
 
@@ -24,10 +24,23 @@ export const walkFileSync = (currentPath: string, callback: (filePath: string, i
     });
 };
 
+/** 扫描文件夹内的 svg 文件 */
+export const scanSvgFilePaths = (dir: string) => {
+    const filePaths: string[] = [];
+    walkFileSync(dir, (filePath, isFile) => {
+        if (isFile) {
+            if (filePath && path.extname(filePath) === ".svg") {
+                filePaths.push(filePath);
+            }
+        }
+    });
+    return filePaths;
+};
+
 // ********************************************** 通用工具函数 ***********************************************
 
 /** 提取重复字符 */
-export const findDuplicates = (arr: string[]) => {
+export const findRepeat = (arr: string[]) => {
     const charSet: Set<string> = new Set();
     const duplicates: string[] = [];
     arr.forEach(char => {
@@ -69,14 +82,18 @@ export const ${toCamelCase(fontName)}HTMLUnicode = {
 };
 
 /** 生成 css 文件 */
-export const getCssString = (fontName: string, metadata: FontMetadata[]) => {
+export const getCssString = (fontName: string, fontTypes: FontType[], metadata: FontMetadata[]) => {
     const now = Date.now();
     return `
 @font-face {
     font-family: "${fontName}";
-    src: ${`url("${fontName}.ttf?t=${now}") format("truetype"),
-		url("${fontName}.woff?t=${now}") format("woff"),
-		url("${fontName}.woff2?t=${now}") format("woff2")`};
+    src: ${[
+        fontTypes.includes("ttf") && `url("${fontName}.ttf?t=${now}") format("truetype")`,
+        fontTypes.includes("woff") && `url("${fontName}.woff?t=${now}") format("woff")`,
+        fontTypes.includes("woff2") && `url("${fontName}.woff2?t=${now}") format("woff2")`,
+    ]
+        .filter(Boolean)
+        .join(",\n\t\t")};
 }
 
 .${fontName} {

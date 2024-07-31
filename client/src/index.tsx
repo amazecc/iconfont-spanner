@@ -1,8 +1,8 @@
 import React, { useEffect, Suspense, lazy } from "react";
 import ReactDOM from "react-dom/client";
 import dayjs from "dayjs";
-import { Button, ConfigProvider, message, Modal, Popover, Tabs, Typography } from "antd";
-import { PlusOutlined, RadarChartOutlined, RetweetOutlined, SyncOutlined } from "@ant-design/icons";
+import { Button, ConfigProvider, message, Modal, Tabs, Tooltip } from "antd";
+import { PlusOutlined, RadarChartOutlined, RetweetOutlined } from "@ant-design/icons";
 import { useBoolean } from "ahooks";
 import zhCN from "antd/locale/zh_CN";
 import { getIconList, type FontData } from "./api/getIconList";
@@ -41,11 +41,12 @@ const App = () => {
             message.warning("删除前请进行扫描图标，检查使用情况！");
             return;
         }
-        const usedInFont = usage.font?.used.some(used => used === name);
-        const usedInSvg = usage.component?.used.some(used => used === name);
+        const usedInFont = usage.font?.used.includes(name);
+        const usedInSvg = usage.component?.used.includes(name);
+        const unknownUsed = ![...(usage.font?.unused ?? []), ...(usage.font?.used ?? []), ...(usage.component?.used ?? []), ...(usage.component?.unused ?? [])].includes(name);
         Modal.confirm({
             title: "提示",
-            content: ["确认删除图标吗？", usedInFont || usedInSvg ? "该图标已被使用！" : ""].join(""),
+            content: ["确认删除图标吗？", usedInFont || usedInSvg ? "该图标已被使用！" : unknownUsed ? "该图标使用情况未知，建议重新扫描！" : ""].join(""),
             onOk() {
                 removeIcon(name).then(fetchList);
             },
@@ -74,13 +75,7 @@ const App = () => {
     return (
         <ConfigProvider locale={zhCN}>
             <Suspense>
-                <div className="mx-auto max-w-screen-lg pb-11">
-                    <div className="flex flex-col justify-center py-3">
-                        <Typography.Title level={5}>说明：</Typography.Title>
-                        <Typography.Text type="secondary">1. 添加图标两种方式：1）将 svg 文件放入配置文件的 resourceDir 目录中；2）点击【上传】按钮</Typography.Text>
-                        <Typography.Text type="secondary">3. 每次编辑图标后，如添加，删除，修改名称后，都需要点击【转化】按钮重新生成可直接使用的资源</Typography.Text>
-                        <Typography.Text type="secondary">2. 删除前，请点击【扫描】，检查图标使用情况，灰色为未使用图标（若项目文件过多，扫描过程可能比较久，耐心等待）</Typography.Text>
-                    </div>
+                <div className="mx-auto max-w-screen-lg pb-11 pt-14">
                     <Tabs
                         type="card"
                         items={[
@@ -98,28 +93,31 @@ const App = () => {
                         tabBarExtraContent={{
                             right: (
                                 <div className="flex gap-4">
-                                    <AutoLoadingButton icon={<SyncOutlined />} type="primary" onClick={fetchList}>
-                                        刷新
-                                    </AutoLoadingButton>
-                                    <Popover
-                                        content={
-                                            <span className="flex items-center text-xs text-gray-700">
-                                                <span className="mr-1 h-[1em] w-[1em] bg-slate-200" />
-                                                未使用
-                                            </span>
-                                        }
-                                    >
+                                    <div className="inline-flex gap-3">
+                                        <span className="flex items-center text-xs text-gray-700">
+                                            <span className="mr-1 h-[1em] w-[1em] border border-gray-300 bg-slate-200" />
+                                            未使用
+                                        </span>
+                                        <span className="flex items-center text-xs text-gray-700">
+                                            <span className="mr-1 h-[1em] w-[1em] border border-gray-300 bg-green-200" />
+                                            已使用
+                                        </span>
+                                        <span className="flex items-center text-xs text-gray-700">
+                                            <span className="mr-1 h-[1em] w-[1em] border border-gray-300" />
+                                            未知
+                                        </span>
                                         <AutoLoadingButton icon={<RadarChartOutlined />} type="primary" onClick={scan}>
                                             扫描
                                         </AutoLoadingButton>
-                                    </Popover>
-
+                                    </div>
                                     <Button icon={<PlusOutlined />} type="primary" onClick={setTrue}>
                                         添加
                                     </Button>
-                                    <AutoLoadingButton icon={<RetweetOutlined />} type="primary" onClick={generate}>
-                                        转化
-                                    </AutoLoadingButton>
+                                    <Tooltip title="每次编辑图标，都需要重新转化资源">
+                                        <AutoLoadingButton icon={<RetweetOutlined />} type="primary" onClick={generate}>
+                                            转化
+                                        </AutoLoadingButton>
+                                    </Tooltip>
                                 </div>
                             ),
                         }}

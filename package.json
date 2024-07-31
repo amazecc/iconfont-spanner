@@ -3,14 +3,14 @@
     "version": "1.0.12",
     "description": "iconfont 本地管理服务",
     "bin": {
-        "iconfont": "./out/start.js"
+        "iconfont": "out/start.js"
     },
     "main": "./out/index.js",
     "types": "./out/index.d.ts",
     "homepage": "https://github.com/amazecc/iconfont-spanner",
     "repository": {
         "type": "git",
-        "url": "https://github.com/amazecc/iconfont-spanner"
+        "url": "git+https://github.com/amazecc/iconfont-spanner.git"
     },
     "keywords": [
         "iconfont",

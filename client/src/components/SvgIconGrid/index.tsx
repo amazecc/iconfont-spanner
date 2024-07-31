@@ -26,7 +26,7 @@ const SvgIconGrid: React.FC<SvgIconGridProps> = React.memo(({ metadata, usage, o
                         subName={item.name}
                         icon={
                             <span
-                                className="text-[52px] leading-none"
+                                className="cursor-copy text-[52px]  leading-none"
                                 dangerouslySetInnerHTML={{ __html: item.svgOptimizeString }}
                                 onClick={() => {
                                     navigator.clipboard.writeText(`<${item.name} />`).then(() => {

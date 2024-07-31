@@ -18,25 +18,6 @@ export const importRootFile = async (fileName: string) => {
 /** 导入配置项 */
 export const importConfig = (): Promise<FontManagerOption> => importRootFile("iconfont.config.js").then(res => res.default);
 
-/**
- * 根据名称获取 svg 文件绝对地址
- * @param hasExt 是否需要显示文件扩展名
- * @returns 文件名称
- */
-export const getSvgFileNames = async (hasExt?: boolean) => {
-    const config = await importConfig();
-    const fileNames: string[] = [];
-    walkFileSync(config.resourceDir, (filePath, isFile) => {
-        if (isFile) {
-            if (filePath && path.extname(filePath) === ".svg") {
-                const fileName = path.basename(filePath, hasExt ? undefined : ".svg");
-                fileNames.push(fileName);
-            }
-        }
-    });
-    return fileNames;
-};
-
 /** 根据名称获取 svg 文件绝对地址 */
 export const getSvgFilePathByName = async (name: string) => {
     const config = await importConfig();
