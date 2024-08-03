@@ -2,7 +2,7 @@ import React, { useEffect, Suspense, lazy } from "react";
 import ReactDOM from "react-dom/client";
 import dayjs from "dayjs";
 import { Button, ConfigProvider, message, Modal, Tabs, Tooltip } from "antd";
-import { PlusOutlined, RadarChartOutlined, RetweetOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined, PlusOutlined, RadarChartOutlined, RetweetOutlined } from "@ant-design/icons";
 import { useBoolean } from "ahooks";
 import zhCN from "antd/locale/zh_CN";
 import { getIconList, type FontData } from "./api/getIconList";
@@ -80,7 +80,24 @@ const App = () => {
                         type="card"
                         items={[
                             !!font && {
-                                label: "Font Class",
+                                label: (
+                                    <span>
+                                        <span>Font Class</span>
+                                        <Tooltip
+                                            title={
+                                                <div>
+                                                    <strong>svg 文件要求：</strong>
+                                                    <div>1. svg 标签内只含有 path 元素</div>
+                                                    <div>2. path 元素只能使用 fill 属性填充颜色</div>
+                                                </div>
+                                            }
+                                        >
+                                            <span className="ml-3 text-red-600">
+                                                <InfoCircleOutlined />
+                                            </span>
+                                        </Tooltip>
+                                    </span>
+                                ),
                                 key: "font",
                                 children: <FontIconGrid usage={usage?.font} metadata={font.metadata} onRemove={remove} onRename={rename} />,
                             },

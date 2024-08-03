@@ -13,6 +13,8 @@ npm i -D iconfont-spanner
 1. 项目根目录新建配置文件 `iconfont.config.js`
 2. 执行 `npx iconfont` 启动本地服务，访问地址将在终端显示，打开地址可对图标进行编辑删除，重新生成 iconfont 操作。
 
+![alt text](spanner.png)
+
 ## 配置说明
 
 1. 只生成字体
@@ -35,6 +37,7 @@ module.exports = {
         // <---------------------
         font: {
             name: "iconfont",
+			types: ["ttf", "woff", "woff2"] // 配置生成的字体类型，默认 ["ttf", "woff", "woff2"]
             format: formatCode,
         },
     },
@@ -109,7 +112,7 @@ module.exports = {
     output: {
         dir: path.join(__dirname, "src/assets/font"),
         component: {
-            dir: "react-components", // 输出目录，相对 output.dir 的相对路径
+            dir: "react-components", // 输出目录，相对 output.dir 的相对路径，不传则输出到 output.dir
             fileName: fileName => `Svg${toBigCamelCase(fileName)}.tsx`, // 组件文件名称
             name: fileName => `Svg${toBigCamelCase(fileName)}`, // 组件名称
             content: (...args) => formatCode(getSvgTSReactComponentContent(...args), "typescript"), // 组件代码内容, 并格式化

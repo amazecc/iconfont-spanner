@@ -86,9 +86,8 @@ export class FontManager {
     private async generateSvgFontBuffer() {
         const fontStream = new SVGIcons2SVGFontStream({
             fontName: this.getFont().name, // 字体名称
-            fontHeight: 1024, // 字体高度，1000是一个常用的值，确保图标清晰
+            fontHeight: 1000, // 字体高度，1000是一个常用的值，确保图标清晰
             normalize: true, // 归一化图标大小
-            centerHorizontally: true, // 水平居中图标
             log() {
                 // 不做任何操作，清除内部打印内容
             },
