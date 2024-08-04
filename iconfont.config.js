@@ -9,15 +9,15 @@ const formatCode = (code, parser) => {
 
 /** @type {import('./src').FontManagerOption} */
 module.exports = {
-    resourceDir: path.join(process.cwd(), "client/src/svg"),
+    resourceDir: "client/src/svg",
     output: {
         font: {
-            dir: path.join(process.cwd(), "client/src/font"),
+            dir: "client/src/font",
             name: "iconfont",
             format: formatCode,
         },
         component: {
-            dir: path.join(process.cwd(), "client/src/font/react-components"),
+            dir: "client/src/font/react-components",
             fileFullName: fileName => `${toBigCamelCase(fileName.replace(/_oc$/, "_OC"))}.tsx`,
             name: fileName => toBigCamelCase(fileName.replace(/_oc$/, "_OC")),
             content: (...args) => formatCode(getSvgTSReactComponentContent(...args), "typescript"),
@@ -25,7 +25,7 @@ module.exports = {
         },
     },
     scanDir: {
-        rootDir: path.join(process.cwd(), "client"),
+        rootDir: "client",
         includes: ["src/**/*.{ts,tsx,js,jsx}"],
         excludes: ["src/font/**/*", "**/*.d.ts"],
     },

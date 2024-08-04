@@ -5,7 +5,7 @@ import Router from "@koa/router";
 import { FontManager } from "./utils/FontManager";
 import { getSvgFilePathByName, importConfig, renameFile } from "./utils";
 import { CodeScanner } from "./utils/CodeScanner";
-import { findRepeat, scanSvgFilePaths } from "./utils/FontManager/utils";
+import { findRepeat, getAbsolutePath, scanSvgFilePaths } from "./utils/FontManager/utils";
 
 const router = new Router();
 
@@ -102,7 +102,7 @@ router.post("/api/add", async ctx => {
 
 router.get("/api/scan", async ctx => {
     const config = await importConfig();
-    const cwd = config.scanDir?.rootDir ?? process.cwd();
+    const cwd = config.scanDir?.rootDir ? getAbsolutePath(config.scanDir.rootDir) : process.cwd();
     if (config.scanDir) {
         const fontManager = new FontManager(config);
         fontManager.read();

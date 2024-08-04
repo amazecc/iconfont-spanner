@@ -37,6 +37,14 @@ export const scanSvgFilePaths = (dir: string) => {
     return filePaths;
 };
 
+/**
+ * 获取绝对路径
+ * @param filePath 相对路径则以 cwd 为根路径，否则直接返回
+ */
+export const getAbsolutePath = (filePath: string) => {
+    return path.isAbsolute(filePath) ? filePath : path.resolve(process.cwd(), filePath);
+};
+
 // ********************************************** 通用工具函数 ***********************************************
 
 /** 提取重复字符 */

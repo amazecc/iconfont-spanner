@@ -4,7 +4,7 @@ import SVGIcons2SVGFontStream, { type Metadata } from "svgicons2svgfont";
 import svg2ttf from "svg2ttf";
 import ttf2woff2 from "ttf2woff2";
 import ttf2woff from "ttf2woff";
-import { getTypeDeclarationString, getCssString, optimizeSvgString, findRepeat, scanSvgFilePaths } from "./utils";
+import { getTypeDeclarationString, getCssString, optimizeSvgString, findRepeat, scanSvgFilePaths, getAbsolutePath } from "./utils";
 import type { FontManagerOption, FontMetadata, SvgComponentMetadata, FontOption } from "./type";
 
 // TODO: 支持 esModule
@@ -12,7 +12,7 @@ import type { FontManagerOption, FontMetadata, SvgComponentMetadata, FontOption 
 export class FontManager {
     /** 检查目录下的重复文件名 */
     private static validateRepeatFileName(resourceDir: string) {
-        const filePaths = scanSvgFilePaths(resourceDir);
+        const filePaths = scanSvgFilePaths(getAbsolutePath(resourceDir));
         const repeatFileNames = findRepeat(filePaths.map(item => path.basename(item)));
         if (repeatFileNames.length) {
             const repeatFilePaths = filePaths.filter(filePath => repeatFileNames.includes(path.basename(filePath)));
@@ -163,6 +163,11 @@ export class FontManager {
         }
     }
 
+	/** 获取资源目录地址 */
+    private getResourceDir() {
+        return getAbsolutePath(this.option.resourceDir);
+    }
+
     /**
      * 获取字体相关文件最终文件输出地址
      * @param ext 文件扩展名，如果不传，则返回输出目录地址
@@ -170,7 +175,7 @@ export class FontManager {
      */
     public getFontOutputPath(ext?: string) {
         const { dir, name } = this.getFontOption();
-        return path.resolve(dir, ext ? `${name}.${ext}` : ""); // TODO: 支持绝对地址，相对地址
+        return path.resolve(getAbsolutePath(dir), ext ? `${name}.${ext}` : "");
     }
 
     /**
@@ -180,14 +185,14 @@ export class FontManager {
      */
     public getComponentOutputPath(fileFullName?: string) {
         const { dir } = this.getComponentOption();
-        return path.resolve(dir, fileFullName ?? ""); // TODO: 支持绝对地址，相对地址
+        return path.resolve(getAbsolutePath(dir), fileFullName ?? "");
     }
 
     /** 读取文件资源 */
     public read() {
         const { font, component } = this.option.output;
         let initialUnicodeHex = 0xe000;
-        scanSvgFilePaths(this.option.resourceDir).forEach(filePath => {
+        scanSvgFilePaths(this.getResourceDir()).forEach(filePath => {
             const fileName = path.basename(filePath, ".svg");
             // 如果开启 font 生成
             if (font) {
