@@ -11,14 +11,14 @@ const formatCode = (code, parser) => {
 module.exports = {
     resourceDir: path.join(process.cwd(), "client/src/svg"),
     output: {
-        dir: path.join(process.cwd(), "client/src/font"),
         font: {
+            dir: path.join(process.cwd(), "client/src/font"),
             name: "iconfont",
             format: formatCode,
         },
         component: {
-            dir: "react-components",
-            fileName: fileName => `${toBigCamelCase(fileName.replace(/_oc$/, "_OC"))}.tsx`,
+            dir: path.join(process.cwd(), "client/src/font/react-components"),
+            fileFullName: fileName => `${toBigCamelCase(fileName.replace(/_oc$/, "_OC"))}.tsx`,
             name: fileName => toBigCamelCase(fileName.replace(/_oc$/, "_OC")),
             content: (...args) => formatCode(getSvgTSReactComponentContent(...args), "typescript"),
             fillCurrentColor: fileName => !fileName.endsWith("_oc"),

@@ -33,7 +33,12 @@ router.post("/api/generate", async ctx => {
     const config = await importConfig();
     const fontManager = new FontManager(config);
     fontManager.read();
-    fs.removeSync(config.output.dir);
+    if (fontManager.option.output.font) {
+        fs.removeSync(fontManager.getFontOutputPath());
+    }
+    if (fontManager.option.output.component) {
+        fs.removeSync(fontManager.getComponentOutputPath());
+    }
     fontManager.generate();
     ctx.body = { success: true };
 });

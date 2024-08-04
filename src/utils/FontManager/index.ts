@@ -5,7 +5,9 @@ import svg2ttf from "svg2ttf";
 import ttf2woff2 from "ttf2woff2";
 import ttf2woff from "ttf2woff";
 import { getTypeDeclarationString, getCssString, optimizeSvgString, findRepeat, scanSvgFilePaths } from "./utils";
-import type { FontManagerOption, OutputFile, FontMetadata, SvgComponentMetadata, ComponentOption, FontOption } from "./type";
+import type { FontManagerOption, FontMetadata, SvgComponentMetadata, FontOption } from "./type";
+
+// TODO: 支持 esModule
 
 export class FontManager {
     /** 检查目录下的重复文件名 */
@@ -58,10 +60,10 @@ export class FontManager {
     }
 
     /** 获取字体配置 */
-    private getFont(): Required<FontOption> {
+    private getFontOption(): Required<FontOption> {
         const { font } = this.option.output;
         if (!font) {
-            throw new Error("请在配置文件中设置字体名称");
+            throw new Error("请在配置文件中配置字体");
         }
         return {
             types: ["ttf", "woff", "woff2"],
@@ -70,14 +72,13 @@ export class FontManager {
         };
     }
 
-    /**
-     * 获取最终文件输出位置
-     * @param info 文件信息
-     * @returns 文件绝对地址
-     */
-    private getOutputPath(info: OutputFile) {
-        const { dir = "", name = this.option.output.font?.name, ext } = info;
-        return path.resolve(this.option.output.dir, dir, ext && name ? `${name}.${ext}` : "");
+    /** 获取组件配置 */
+    private getComponentOption() {
+        const { component } = this.option.output;
+        if (!component) {
+            throw new Error("请在配置文件中配置组件");
+        }
+        return component;
     }
 
     /**
@@ -85,7 +86,7 @@ export class FontManager {
      */
     private async generateSvgFontBuffer() {
         const fontStream = new SVGIcons2SVGFontStream({
-            fontName: this.getFont().name, // 字体名称
+            fontName: this.getFontOption().name, // 字体名称
             fontHeight: 1000, // 字体高度，1000是一个常用的值，确保图标清晰
             normalize: true, // 归一化图标大小
             log() {
@@ -119,49 +120,67 @@ export class FontManager {
     /**
      * 生成 svg react 组件文件
      */
-    private async writeComponent(option: ComponentOption) {
-        if (option.dir) {
-            await fs.ensureDir(this.getOutputPath({ dir: option.dir }));
-        }
+    private async writeComponent() {
+        const option = this.getComponentOption();
         this.svgComponentMetadata.forEach(item => {
-            const [fileName, ext] = option.fileName(item.fileName).split(".");
+            const fileFullName = option.fileFullName(item.fileName);
             const name = option.name(item.fileName);
             Promise.resolve(option.content(name, item.svgOptimizeString, item.fileName)).then(content => {
-                fs.writeFile(this.getOutputPath({ dir: option.dir, name: fileName, ext }), content);
+                fs.writeFile(this.getComponentOutputPath(fileFullName), content);
             });
         });
     }
 
     /** 写入 typescript 类型声明 */
     private async writeTypeDeclarationFile() {
-        const { name, format } = this.getFont();
+        const { name, format } = this.getFontOption();
         const typeDeclarationString = await format(getTypeDeclarationString(name, this.fontMetadata), "typescript");
-        fs.writeFileSync(this.getOutputPath({ ext: "ts" }), typeDeclarationString);
+        fs.writeFileSync(this.getFontOutputPath("ts"), typeDeclarationString);
     }
 
     /** 写入 css 文件 */
     private async writeCSSFile() {
-        const { name, types, format } = this.getFont();
+        const { name, types, format } = this.getFontOption();
         const cssString = await format(getCssString(name, types, this.fontMetadata), "css");
-        fs.writeFileSync(this.getOutputPath({ ext: "css" }), cssString);
+        fs.writeFileSync(this.getFontOutputPath("css"), cssString);
     }
 
     /** 写入 font 文件 */
     private async writeFontFiles() {
-        const { types } = this.getFont();
+        const { types } = this.getFontOption();
         const { ttfBuffer, woffBuffer, woff2Buffer } = await this.generateFontBuffer();
         if (types.includes("ttf")) {
             // 写入 TTF 文件
-            fs.writeFileSync(this.getOutputPath({ ext: "ttf" }), ttfBuffer);
+            fs.writeFileSync(this.getFontOutputPath("ttf"), ttfBuffer);
         }
         if (types.includes("woff2")) {
             // 写入 WOFF2 文件
-            fs.writeFileSync(this.getOutputPath({ ext: "woff2" }), woff2Buffer());
+            fs.writeFileSync(this.getFontOutputPath("woff2"), woff2Buffer());
         }
         if (types.includes("woff")) {
             // 写入 WOFF 文件
-            fs.writeFileSync(this.getOutputPath({ ext: "woff" }), woffBuffer());
+            fs.writeFileSync(this.getFontOutputPath("woff"), woffBuffer());
         }
+    }
+
+    /**
+     * 获取字体相关文件最终文件输出地址
+     * @param ext 文件扩展名，如果不传，则返回输出目录地址
+     * @returns 地址
+     */
+    public getFontOutputPath(ext?: string) {
+        const { dir, name } = this.getFontOption();
+        return path.resolve(dir, ext ? `${name}.${ext}` : ""); // TODO: 支持绝对地址，相对地址
+    }
+
+    /**
+     * 获取组件输出地址
+     * @param fileFullName 文件全称，包含扩展名，不传则返回输出文件目录地址
+     * @returns
+     */
+    public getComponentOutputPath(fileFullName?: string) {
+        const { dir } = this.getComponentOption();
+        return path.resolve(dir, fileFullName ?? ""); // TODO: 支持绝对地址，相对地址
     }
 
     /** 读取文件资源 */
@@ -209,14 +228,15 @@ export class FontManager {
 
     /** 生成字体等资源文件 */
     public async generate() {
-        await fs.ensureDir(this.option.output.dir);
         if (this.option.output.font) {
+            await fs.ensureDir(this.getFontOutputPath());
             await this.writeFontFiles();
             await this.writeTypeDeclarationFile();
             await this.writeCSSFile();
         }
         if (this.option.output.component) {
-            await this.writeComponent(this.option.output.component);
+            await fs.ensureDir(this.getComponentOutputPath());
+            await this.writeComponent();
         }
     }
 }
