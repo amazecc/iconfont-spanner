@@ -1,11 +1,9 @@
 import fs from "fs-extra";
 import path from "path";
-import { glob } from "glob";
 import Router from "@koa/router";
 import { FontManager } from "./utils/FontManager";
 import { getSvgFilePathByName, importConfig, renameFile } from "./utils";
-import { CodeScanner } from "./utils/CodeScanner";
-import { findRepeat, getAbsolutePath, scanSvgFilePaths } from "./utils/FontManager/utils";
+import { findRepeat, scanSvgFilePaths } from "./utils/FontManager/utils";
 
 const router = new Router();
 
@@ -16,14 +14,14 @@ router.get("/api/list", async ctx => {
     ctx.body = {
         success: true,
         data: {
-            font: fontManager.option.output.font?.name
+            font: fontManager.font
                 ? {
-                      name: fontManager.option.output.font?.name,
-                      metadata: fontManager.fontMetadata,
+                      name: fontManager.font.option.name,
+                      metadata: fontManager.font.metadata,
                   }
                 : undefined,
-            component: fontManager.option.output.component && {
-                metadata: fontManager.svgComponentMetadata,
+            component: fontManager.component && {
+                metadata: fontManager.component.metadata,
             },
         },
     };
@@ -33,11 +31,11 @@ router.post("/api/generate", async ctx => {
     const config = await importConfig();
     const fontManager = new FontManager(config);
     fontManager.read();
-    if (fontManager.option.output.font) {
-        fs.removeSync(fontManager.getFontOutputPath());
+    if (fontManager.font) {
+        fs.removeSync(fontManager.font.getOutputPath());
     }
-    if (fontManager.option.output.component) {
-        fs.removeSync(fontManager.getComponentOutputPath());
+    if (fontManager.component) {
+        fs.removeSync(fontManager.component.getOutputPath());
     }
     fontManager.generate();
     ctx.body = { success: true };
@@ -102,20 +100,26 @@ router.post("/api/add", async ctx => {
 
 router.get("/api/scan", async ctx => {
     const config = await importConfig();
-    const cwd = config.scanDir?.rootDir ? getAbsolutePath(config.scanDir.rootDir) : process.cwd();
-    if (config.scanDir) {
-        const fontManager = new FontManager(config);
-        fontManager.read();
-        const filePaths = await glob(config.scanDir.includes, { ignore: config.scanDir.excludes, cwd });
-        const scanner = new CodeScanner(filePaths.map(filePath => path.join(cwd, filePath)));
 
-        const getFontUsage = () => scanner.findUsage(fontManager.fontMetadata.map(metadata => metadata.fileName));
+    const fontManager = new FontManager(config);
+    const { scanner } = fontManager;
+    fontManager.read();
+    if (scanner) {
+        const getFontUsage = () => {
+            if (fontManager.font) {
+                return scanner.scanUsage(fontManager.font.metadata.map(metadata => metadata.fileName));
+            }
+            return undefined;
+        };
         const getSvgUsage = async () => {
-            const svgUsage = await scanner.findUsage(fontManager.svgComponentMetadata.map(metadata => metadata.name));
-            return {
-                used: fontManager.svgComponentMetadata.filter(metadata => svgUsage.used.includes(metadata.name)).map(item => item.fileName),
-                unused: fontManager.svgComponentMetadata.filter(metadata => svgUsage.unused.includes(metadata.name)).map(item => item.fileName),
-            };
+            if (fontManager.component) {
+                const svgUsage = await scanner.scanUsage(fontManager.component.metadata.map(metadata => metadata.name));
+                return {
+                    used: fontManager.component.metadata.filter(metadata => svgUsage.used.includes(metadata.name)).map(item => item.fileName),
+                    unused: fontManager.component.metadata.filter(metadata => svgUsage.unused.includes(metadata.name)).map(item => item.fileName),
+                };
+            }
+            return undefined;
         };
 
         ctx.body = {
@@ -123,8 +127,8 @@ router.get("/api/scan", async ctx => {
             data:
                 config.output.font || config.output.component
                     ? {
-                          font: config.output.font && (await getFontUsage()),
-                          component: config.output.component && (await getSvgUsage()),
+                          font: await getFontUsage(),
+                          component: await getSvgUsage(),
                       }
                     : null,
         };
@@ -139,31 +143,52 @@ router.get("/api/scan", async ctx => {
 router.get("/api/ttf", async ctx => {
     const config = await importConfig();
     const fontManager = new FontManager(config);
-    fontManager.read();
-    const { ttfBuffer } = await fontManager.generateFontBuffer();
-    ctx.body = ttfBuffer;
-    ctx.set("Content-Disposition", `inline; filename="${fontManager.option.output.font?.name ?? "font"}.ttf"`);
-    ctx.set("Content-Type", "font/ttf");
+    if (fontManager.font) {
+        fontManager.read();
+        const { ttfBuffer } = await fontManager.font.generateFontBuffer();
+        ctx.body = ttfBuffer;
+        ctx.set("Content-Disposition", `inline; filename="${fontManager.font.option.name ?? "font"}.ttf"`);
+        ctx.set("Content-Type", "font/ttf");
+    } else {
+        ctx.body = {
+            success: false,
+            message: "请配置 output.font",
+        };
+    }
 });
 
 router.get("/api/woff", async ctx => {
     const config = await importConfig();
     const fontManager = new FontManager(config);
-    fontManager.read();
-    const { woffBuffer } = await fontManager.generateFontBuffer();
-    ctx.body = woffBuffer();
-    ctx.set("Content-Disposition", `inline; filename="${fontManager.option.output.font?.name ?? "font"}.woff"`);
-    ctx.set("Content-Type", "font/woff");
+    if (fontManager.font) {
+        fontManager.read();
+        const { woffBuffer } = await fontManager.font.generateFontBuffer();
+        ctx.body = woffBuffer();
+        ctx.set("Content-Disposition", `inline; filename="${fontManager.font.option.name ?? "font"}.woff"`);
+        ctx.set("Content-Type", "font/woff");
+    } else {
+        ctx.body = {
+            success: false,
+            message: "请配置字体",
+        };
+    }
 });
 
 router.get("/api/woff2", async ctx => {
     const config = await importConfig();
     const fontManager = new FontManager(config);
-    fontManager.read();
-    const { woff2Buffer } = await fontManager.generateFontBuffer();
-    ctx.body = woff2Buffer();
-    ctx.set("Content-Disposition", `inline; filename="${fontManager.option.output.font?.name ?? "font"}.woff2"`);
-    ctx.set("Content-Type", "font/woff2");
+    if (fontManager.font) {
+        fontManager.read();
+        const { woff2Buffer } = await fontManager.font.generateFontBuffer();
+        ctx.body = woff2Buffer();
+        ctx.set("Content-Disposition", `inline; filename="${fontManager.font.option.name ?? "font"}.woff2"`);
+        ctx.set("Content-Type", "font/woff2");
+    } else {
+        ctx.body = {
+            success: false,
+            message: "请配置字体",
+        };
+    }
 });
 
 export { router };

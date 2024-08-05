@@ -1,8 +1,10 @@
 import path from "path";
 import fs from "fs-extra";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
 import { exec } from "child_process";
-import { FontManagerOption } from "./FontManager/type";
 import { walkFileSync } from "./FontManager/utils";
+import type { FontManagerOption } from "./FontManager";
 
 /**
  * 导入根目录文件
@@ -71,4 +73,19 @@ export const renameFile = async (oldPath: string, newPath: string) => {
     } else {
         console.log(`[rename]: ${oldFileName} -> ${newFileName}`);
     }
+};
+
+/**
+ * 获取命令行参数
+ * @example
+ * ```sh
+ * yarn build dev --url=www.example.com -D  // getCommandLineParams().array = ["dev"]; getCommandLineParams().object = { url: "www.example.com", D: true }
+ * ```
+ */
+export const getCommandLineParams = <A extends string[] = string[], O extends Record<string, any> = Record<string, any>>() => {
+    const { _: paramsArray, ...restParams } = yargs(hideBin(process.argv)).argv as any;
+    return {
+        array: paramsArray as A,
+        object: restParams as O,
+    };
 };

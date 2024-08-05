@@ -1,10 +1,12 @@
 import fs from "fs-extra";
 import path from "path";
 import { optimize } from "svgo";
-import type { FontMetadata, ComponentOption, FontType } from "./type";
+import type { FontMetadata, FontType } from "./Font";
+import type { ComponentOption } from "./Component";
 
 // ********************************************** node 工具函数 ***********************************************
 
+// TODO: 使用 glob 重构
 /** 遍历当前文件夹下的所有文件路径 */
 export const walkFileSync = (currentPath: string, callback: (filePath: string, isFile: boolean) => void) => {
     const currentStat = fs.statSync(currentPath);
@@ -24,6 +26,7 @@ export const walkFileSync = (currentPath: string, callback: (filePath: string, i
     });
 };
 
+// TODO: 使用 glob 重构
 /** 扫描文件夹内的 svg 文件 */
 export const scanSvgFilePaths = (dir: string) => {
     const filePaths: string[] = [];
@@ -43,6 +46,50 @@ export const scanSvgFilePaths = (dir: string) => {
  */
 export const getAbsolutePath = (filePath: string) => {
     return path.isAbsolute(filePath) ? filePath : path.resolve(process.cwd(), filePath);
+};
+
+/**
+ * 优化 svg 代码，修改 fill 与宽高等
+ * @param svg svg 文件字符
+ * @returns 优化后的 svg 字符
+ */
+export const optimizeSvgString = (svg: string, fillCurrentColor: boolean) => {
+    const { data } = optimize(svg, {
+        plugins: [
+            {
+                name: "preset-default",
+                params: {
+                    overrides: {
+                        removeViewBox: false,
+                    },
+                },
+            },
+            {
+                name: "modifySvgSizeAndColor",
+                fn: () => {
+                    return {
+                        element: {
+                            enter: node => {
+                                if (node.name === "svg") {
+                                    // eslint-disable-next-line no-param-reassign
+                                    node.attributes.width = "1em";
+                                    // eslint-disable-next-line no-param-reassign
+                                    node.attributes.height = "1em";
+                                    // eslint-disable-next-line no-param-reassign
+                                    delete node.attributes.class;
+                                }
+                                if (node.name === "path" && fillCurrentColor) {
+                                    // eslint-disable-next-line no-param-reassign
+                                    node.attributes.fill = "currentColor";
+                                }
+                            },
+                        },
+                    };
+                },
+            },
+        ],
+    });
+    return data;
 };
 
 // ********************************************** 通用工具函数 ***********************************************
@@ -120,50 +167,6 @@ ${metadata
     })
     .join("\n")}
 `;
-};
-
-/**
- * 优化 svg 代码，修改 fill 与宽高等
- * @param svg svg 文件字符
- * @returns 优化后的 svg 字符
- */
-export const optimizeSvgString = (svg: string, fillCurrentColor: boolean) => {
-    const { data } = optimize(svg, {
-        plugins: [
-            {
-                name: "preset-default",
-                params: {
-                    overrides: {
-                        removeViewBox: false,
-                    },
-                },
-            },
-            {
-                name: "modifySvgSizeAndColor",
-                fn: () => {
-                    return {
-                        element: {
-                            enter: node => {
-                                if (node.name === "svg") {
-                                    // eslint-disable-next-line no-param-reassign
-                                    node.attributes.width = "1em";
-                                    // eslint-disable-next-line no-param-reassign
-                                    node.attributes.height = "1em";
-                                    // eslint-disable-next-line no-param-reassign
-                                    delete node.attributes.class;
-                                }
-                                if (node.name === "path" && fillCurrentColor) {
-                                    // eslint-disable-next-line no-param-reassign
-                                    node.attributes.fill = "currentColor";
-                                }
-                            },
-                        },
-                    };
-                },
-            },
-        ],
-    });
-    return data;
 };
 
 /** 获取 typescript 版本的 svg react 组件内容 */

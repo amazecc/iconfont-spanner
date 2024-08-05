@@ -17,6 +17,7 @@ module.exports = {
         "default-case": 0,
         "no-shadow": "off",
         "consistent-return": 0,
+        "no-plusplus": 0,
         "no-nested-ternary": 0,
         "react/jsx-filename-extension": [1, { extensions: [".tsx"] }],
         "react/function-component-definition": 0,
