@@ -55,11 +55,10 @@ const formatCode = (code, parser) => {
 
 /** @type {import('iconfont-spanner').FontManagerOption} */
 module.exports = {
-    resourceDir: path.join(__dirname, "src/assets/svgs"),
+    resourceDir: "src/assets/svgs",
     output: {
-        dir: path.join(__dirname, "src/assets/font"),
-        // <---------------------
         font: {
+			dir: "src/assets/font",
             name: "iconfont",
 			types: ["ttf", "woff", "woff2"] // 配置生成的字体类型，默认 ["ttf", "woff", "woff2"]
             format: formatCode,
@@ -84,10 +83,8 @@ const formatCode = (code, parser) => {
 module.exports = {
     resourceDir: path.join(__dirname, "src/assets/svgs"),
     output: {
-        dir: path.join(__dirname, "src/assets/font"),
-        // <---------------------
         component: {
-            dir: "react-components", // 输出目录，相对 output.dir 的相对路径
+            dir: "src/assets/font",
             fileName: fileName => `Svg${toBigCamelCase(fileName)}.tsx`, // 组件文件名称
             name: fileName => `Svg${toBigCamelCase(fileName)}`, // 组件名称
             content: (...args) => formatCode(getSvgTSReactComponentContent(...args), "typescript"), // 组件代码内容, 并格式化
@@ -134,9 +131,8 @@ const formatCode = (code, parser) => {
 module.exports = {
     resourceDir: path.join(__dirname, "src/assets/svgs"),
     output: {
-        dir: path.join(__dirname, "src/assets/font"),
         component: {
-            dir: "react-components", // 输出目录，相对 output.dir 的相对路径，不传则输出到 output.dir
+            dir: "src/assets/font",
             fileName: fileName => `Svg${toBigCamelCase(fileName)}.tsx`, // 组件文件名称
             name: fileName => `Svg${toBigCamelCase(fileName)}`, // 组件名称
             content: (...args) => formatCode(getSvgTSReactComponentContent(...args), "typescript"), // 组件代码内容, 并格式化
