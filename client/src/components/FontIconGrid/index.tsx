@@ -1,6 +1,6 @@
 import React from "react";
 import classnames from "classnames";
-import type { FontMetadata } from "server/utils/FontManager/type";
+import type { FontMetadata } from "server/utils/FontManager/Font";
 import { type FontUsage } from "../../api/scanIcon";
 import { FontStyle } from "./FontStyle";
 import { FontCard } from "../FontCard";

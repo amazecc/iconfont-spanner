@@ -3,7 +3,7 @@ import fs from "fs-extra";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { exec } from "child_process";
-import { walkFileSync } from "./FontManager/utils";
+import { scanSvgFilePaths } from "./FontManager/utils";
 import type { FontManagerOption } from "./FontManager";
 
 /**
@@ -23,18 +23,7 @@ export const importConfig = (): Promise<FontManagerOption> => importRootFile("ic
 /** 根据名称获取 svg 文件绝对地址 */
 export const getSvgFilePathByName = async (name: string) => {
     const config = await importConfig();
-    let fileAbsolutePath: string | undefined;
-    walkFileSync(config.resourceDir, (filePath, isFile) => {
-        if (isFile) {
-            if (filePath && path.extname(filePath) === ".svg") {
-                const fileName = path.basename(filePath, ".svg");
-                if (fileName === name) {
-                    fileAbsolutePath = filePath;
-                }
-            }
-        }
-    });
-    return fileAbsolutePath;
+    return scanSvgFilePaths(config.resourceDir).find(item => path.basename(item, ".svg") === name);
 };
 
 /**

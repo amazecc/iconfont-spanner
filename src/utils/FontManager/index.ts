@@ -28,7 +28,7 @@ export class FontManager {
 
     /** 检查目录下的重复文件名 */
     private static validateRepeatFileName(resourceDir: string) {
-        const filePaths = scanSvgFilePaths(getAbsolutePath(resourceDir));
+        const filePaths = scanSvgFilePaths(resourceDir);
         const repeatFileNames = findRepeat(filePaths.map(item => path.basename(item)));
         if (repeatFileNames.length) {
             const repeatFilePaths = filePaths.filter(filePath => repeatFileNames.includes(path.basename(filePath)));

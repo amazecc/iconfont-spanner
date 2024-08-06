@@ -23,7 +23,7 @@
     "author": "",
     "license": "MIT",
     "scripts": {
-        "start-server": "tsx src/start.ts start --port 8081",
+        "start-server": "tsx src/start.ts start",
         "start-client": "cd client && pnpm run start",
         "build-server": "tsc",
         "build-client": "cd client && pnpm run build",

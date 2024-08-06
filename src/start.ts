@@ -3,8 +3,6 @@ import { start } from "./service";
 import { FontManager } from "./utils/FontManager";
 import { importConfig, getCommandLineParams } from "./utils";
 
-// TODO: 支持 esModule
-
 type Command = "start"; // 启动本地服务
 
 interface CommandParams {

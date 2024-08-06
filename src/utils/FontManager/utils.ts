@@ -1,44 +1,25 @@
-import fs from "fs-extra";
 import path from "path";
 import { optimize } from "svgo";
+import { globSync } from "glob";
 import type { FontMetadata, FontType } from "./Font";
 import type { ComponentOption } from "./Component";
 
 // ********************************************** node 工具函数 ***********************************************
 
-// TODO: 使用 glob 重构
-/** 遍历当前文件夹下的所有文件路径 */
-export const walkFileSync = (currentPath: string, callback: (filePath: string, isFile: boolean) => void) => {
-    const currentStat = fs.statSync(currentPath);
-    if (currentStat.isFile()) {
-        callback(currentPath, true);
-        return;
-    }
-    fs.readdirSync(currentPath).forEach(name => {
-        const filePath = path.join(currentPath, name);
-        const stat = fs.statSync(filePath);
-        if (stat.isFile()) {
-            callback(filePath, true);
-        } else if (stat.isDirectory()) {
-            callback(filePath, false);
-            walkFileSync(filePath, callback);
-        }
-    });
-};
+/**
+ * 扫描文件地址
+ * @param ext 文件扩展名
+ * @param dir 文件夹中搜索，如果传相对地址，则基于 process.cwd() 查询
+ * @returns 文件绝对地址
+ */
+const scanFilePaths = (ext: string, dir = "") => globSync(path.join(getAbsolutePath(dir), `**/*.${ext}`));
 
-// TODO: 使用 glob 重构
-/** 扫描文件夹内的 svg 文件 */
-export const scanSvgFilePaths = (dir: string) => {
-    const filePaths: string[] = [];
-    walkFileSync(dir, (filePath, isFile) => {
-        if (isFile) {
-            if (filePath && path.extname(filePath) === ".svg") {
-                filePaths.push(filePath);
-            }
-        }
-    });
-    return filePaths;
-};
+/**
+ * 扫描文件夹内的 svg 文件
+ * @param dir 文件夹中搜索，如果传相对地址，则基于 process.cwd() 查询
+ * @returns 文件绝对地址
+ */
+export const scanSvgFilePaths = (dir?: string) => scanFilePaths("svg", dir);
 
 /**
  * 获取绝对路径

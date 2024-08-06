@@ -1,5 +1,5 @@
 import React from "react";
-import type { FontMetadata } from "server/utils/FontManager/type";
+import type { FontMetadata } from "server/utils/FontManager/Font";
 
 export interface FontStyleProps {
     metadata: FontMetadata[];

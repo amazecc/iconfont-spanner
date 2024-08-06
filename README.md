@@ -11,9 +11,33 @@ npm i -D iconfont-spanner
 ## 使用
 
 1. 项目根目录新建配置文件 `iconfont.config.js`
-2. 执行 `npx iconfont` 启动本地服务，访问地址将在终端显示，打开地址可对图标进行编辑删除，重新生成 iconfont 操作。
+2. 执行 `npx iconfont` 生成 iconfont, 或
+3. 执行 `npx iconfont start` 启动本地服务，访问地址将在终端显示，打开地址可对图标进行编辑删除，重新生成 iconfont 操作。
 
 ![alt text](spanner.png)
+
+```sh
+# 终端转化
+npx iconfont
+# 启动服务，网页操作，包括增删改查，查询使用情况，转化等功能
+npx iconfont start
+# 启动服务，网页操作，指定端口
+npx iconfont start --port 8080
+```
+
+## 功能
+
+-   [x] svg 转化为字体(font),可配置 `ttf`, `woff`, `woff2` 中的任意几种
+-   [x] svg 转化为组件，可自定义组件内容
+-   [x] 本地执行 cli `npx iconfont` 转化
+-   [x] 本地执行 cli `npx iconfont start` 启动本地服务
+    -   [x] 添加，支持多选与文件夹拖入
+    -   [x] 删除
+    -   [x] 编辑名称
+    -   [x] 字体(font)与 svg 实时预览
+    -   [x] 扫描引用情况
+-   [x] commonjs 支持
+-   [ ] ES Module 支持
 
 ## 配置说明
 

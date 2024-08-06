@@ -1,6 +1,6 @@
 import React from "react";
 import classnames from "classnames";
-import type { SvgComponentMetadata } from "server/utils/FontManager/type";
+import type { SvgComponentMetadata } from "server/utils/FontManager/Component";
 import { type FontUsage } from "../../api/scanIcon";
 import { FontCard } from "../FontCard";
 import { message } from "antd";
