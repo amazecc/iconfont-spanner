@@ -1,6 +1,6 @@
 {
     "name": "iconfont-spanner",
-    "version": "2.0.1",
+    "version": "2.1.0",
     "description": "iconfont 本地管理服务",
     "bin": {
         "iconfont": "out/start.js"
