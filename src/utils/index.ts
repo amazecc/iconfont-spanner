@@ -12,8 +12,8 @@ import type { FontManagerOption } from "./FontManager";
  * @returns 返回文件木模块
  */
 export const importRootFile = async (fileName: string) => {
-    const backToPwdPath = path.relative(path.dirname(__filename), process.cwd()); // 回退到 pwd 的地址字符，如 ../..
-    const filePath = path.join(backToPwdPath, fileName);
+    const backToCwdRelativePath = path.relative(path.dirname(__filename), process.cwd()); // 回退到 cwd 的地址字符，如 ../..
+    const filePath = path.join(backToCwdRelativePath, fileName).split(path.sep).join(path.posix.sep); // 强制转换为 linux 下的正斜杠路径，遵循 javascript 模块地址标准
     return import(filePath);
 };
 

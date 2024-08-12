@@ -58,9 +58,9 @@ module.exports = {
     resourceDir: "src/assets/svgs",
     output: {
         font: {
-			dir: "src/assets/font",
+            dir: "src/assets/font",
             name: "iconfont",
-			types: ["ttf", "woff", "woff2"] // 配置生成的字体类型，默认 ["ttf", "woff", "woff2"]
+            types: ["ttf", "woff", "woff2"], // 配置生成的字体类型，默认 ["ttf", "woff", "woff2"]
             format: formatCode,
         },
     },
@@ -141,7 +141,7 @@ module.exports = {
     },
     // <------------------
     scanDir: {
-        rootDir: process.cwd(), // 文件扫描根目录，默认 process.cwd()
+        // rootDir: process.cwd(), // 文件扫描根目录，默认 process.cwd()
         includes: ["src/**/*.{ts,tsx,js,jsx}"], // 扫描的文件
         excludes: ["src/assets/font/**/*", "**/*.d.ts"], // 排除的文件，一般会排除掉输出目录（output.dir）
     },
@@ -162,4 +162,4 @@ module.exports = {
 
 ### 组件
 
-根据文件名生成的 svg 组件，可直接引用使用
+根据文件名生成的 svg 组件
