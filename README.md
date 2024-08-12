@@ -85,7 +85,7 @@ module.exports = {
     output: {
         component: {
             dir: "src/assets/font",
-            fileName: fileName => `Svg${toBigCamelCase(fileName)}.tsx`, // 组件文件名称
+            fileFullName: fileName => `Svg${toBigCamelCase(fileName)}.tsx`, // 组件文件名称
             name: fileName => `Svg${toBigCamelCase(fileName)}`, // 组件名称
             content: (...args) => formatCode(getSvgTSReactComponentContent(...args), "typescript"), // 组件代码内容, 并格式化
             fillCurrentColor: fileName => !fileName.endsWith("_oc"), // 文件名以 _oc 结尾的 svg 组件不清除颜色，如：icon_oc.svg
@@ -133,14 +133,14 @@ module.exports = {
     output: {
         component: {
             dir: "src/assets/font",
-            fileName: fileName => `Svg${toBigCamelCase(fileName)}.tsx`, // 组件文件名称
+            fileFullName: fileName => `Svg${toBigCamelCase(fileName)}.tsx`, // 组件文件名称
             name: fileName => `Svg${toBigCamelCase(fileName)}`, // 组件名称
             content: (...args) => formatCode(getSvgTSReactComponentContent(...args), "typescript"), // 组件代码内容, 并格式化
             fillCurrentColor: fileName => !fileName.endsWith("_oc"), // 文件名以 _oc 结尾的 svg 组件不清除颜色，如：icon_oc.svg
         },
     },
     // <------------------
-    scanDir: {
+    scan: {
         // rootDir: process.cwd(), // 文件扫描根目录，默认 process.cwd()
         includes: ["src/**/*.{ts,tsx,js,jsx}"], // 扫描的文件
         excludes: ["src/assets/font/**/*", "**/*.d.ts"], // 排除的文件，一般会排除掉输出目录（output.dir）

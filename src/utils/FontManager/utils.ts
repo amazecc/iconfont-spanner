@@ -12,7 +12,9 @@ import type { ComponentOption } from "./Component";
  * @param dir 文件夹中搜索，如果传相对地址，则基于 process.cwd() 查询
  * @returns 文件绝对地址
  */
-const scanFilePaths = (ext: string, dir = "") => globSync(path.join(getAbsolutePath(dir), `**/*.${ext}`));
+const scanFilePaths = (ext: string, dir = "") => {
+    return globSync(path.join(getAbsolutePath(dir), `**/*.${ext}`).split(path.sep).join(path.posix.sep));
+};
 
 /**
  * 扫描文件夹内的 svg 文件
