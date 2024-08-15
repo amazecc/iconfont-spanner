@@ -2,11 +2,32 @@
     "name": "iconfont-spanner",
     "version": "2.1.0",
     "description": "iconfont 本地管理服务",
+    "type": "module",
     "bin": {
-        "iconfont": "out/start.js"
+        "iconfont": "bin.js"
     },
-    "main": "./out/index.js",
-    "types": "./out/index.d.ts",
+    "main": "./out/cjs/index.js",
+    "module": "./out/esm/index.js",
+    "types": "./out/esm/index.d.ts",
+    "exports": {
+        ".": {
+            "require": {
+                "types": "./out/cjs/index.d.ts",
+                "default": "./out/cjs/index.js"
+            },
+            "import": {
+                "types": "./out/esm/index.d.ts",
+                "default": "./out/esm/index.js"
+            }
+        }
+    },
+    "files": [
+        "out/",
+        "bin.js",
+        "package.json",
+        "README.md",
+        "LICENSE"
+    ],
     "homepage": "https://github.com/amazecc/iconfont-spanner",
     "repository": {
         "type": "git",
@@ -23,14 +44,20 @@
     "author": "",
     "license": "MIT",
     "scripts": {
-        "start-server": "tsx src/start.ts start",
+        "start-server": "tsx bin-dev.ts start",
         "start-client": "cd client && pnpm run start",
-        "build-server": "tsc",
+        "build-server": "tsc && tsc -p ./tsconfig.cjs.json",
         "build-client": "cd client && pnpm run build",
         "build-all": "rm -rf out && pnpm run build-server && pnpm run build-client",
-        "major": "npm version major && npm publish",
-        "minor": "npm version minor && npm publish",
-        "patch": "npm version patch && npm publish"
+        "clear-client": "rm -rf out/static",
+        "clear-server": "rm -rf out/cjs out/esm",
+        "major": "npm version major",
+        "minor": "npm version minor",
+        "patch": "npm version patch",
+        "premajor": "npm version premajor --preid=beta",
+        "preminor": "npm version preminor --preid=beta",
+        "prepatch": "npm version prepatch --preid=beta",
+        "prerelease": "npm version prerelease --preid=beta"
     },
     "dependencies": {
         "@koa/bodyparser": "^5.1.1",

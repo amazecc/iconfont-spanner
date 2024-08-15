@@ -1,8 +1,8 @@
 import path from "path";
 import { optimize } from "svgo";
 import { globSync } from "glob";
-import type { FontMetadata, FontType } from "./Font";
-import type { ComponentOption } from "./Component";
+import type { FontMetadata, FontType } from "./Font.js";
+import type { ComponentOption } from "./Component.js";
 
 // ********************************************** node 工具函数 ***********************************************
 

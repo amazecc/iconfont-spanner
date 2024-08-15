@@ -1,9 +1,9 @@
 import fs from "fs-extra";
 import path from "path";
 import Router from "@koa/router";
-import { FontManager } from "./utils/FontManager";
-import { getSvgFilePathByName, importConfig, renameFile } from "./utils";
-import { findRepeat, scanSvgFilePaths } from "./utils/FontManager/utils";
+import { FontManager } from "./utils/FontManager/index.js";
+import { getSvgFilePathByName, importConfig, renameFile } from "./utils/index.js";
+import { findRepeat, scanSvgFilePaths } from "./utils/FontManager/utils.js";
 
 const router = new Router();
 

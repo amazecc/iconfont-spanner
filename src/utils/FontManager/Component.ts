@@ -1,6 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
-import { getAbsolutePath, optimizeSvgString } from "./utils";
+import { getAbsolutePath, optimizeSvgString } from "./utils.js";
 
 export interface ComponentOption {
     /** 组件放置的文件夹 */

@@ -1,9 +1,9 @@
 @font-face {
   font-family: "iconfont";
   src:
-    url("iconfont.ttf?t=1721893213644") format("truetype"),
-    url("iconfont.woff?t=1721893213644") format("woff"),
-    url("iconfont.woff2?t=1721893213644") format("woff2");
+    url("iconfont.ttf?t=1723712459473") format("truetype"),
+    url("iconfont.woff?t=1723712459473") format("woff"),
+    url("iconfont.woff2?t=1723712459473") format("woff2");
 }
 
 .iconfont {
@@ -14,14 +14,26 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-add_oc::before {
+.spanner::before {
   content: "\E001";
 }
 
-.icon-area::before {
+.icon-color_oc::before {
   content: "\E002";
 }
 
-.icon-color_oc::before {
+.icon-arrow2-right::before {
   content: "\E003";
+}
+
+.icon-arrow1-right::before {
+  content: "\E004";
+}
+
+.icon-area::before {
+  content: "\E005";
+}
+
+.icon-add_oc::before {
+  content: "\E006";
 }

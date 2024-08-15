@@ -3,8 +3,14 @@ import fs from "fs-extra";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { exec } from "child_process";
-import { scanSvgFilePaths } from "./FontManager/utils";
-import type { FontManagerOption } from "./FontManager";
+import { scanSvgFilePaths } from "./FontManager/utils.js";
+import type { FontManagerOption } from "./FontManager/index.js";
+import { fileURLToPath } from "url";
+
+const isCommonJS = typeof require !== "undefined" && typeof module !== "undefined";
+// @ts-ignore
+const _filename = isCommonJS ? __filename : fileURLToPath(import.meta.url);
+// const _dirname = isCommonJS ? __filename : path.dirname(_filename);
 
 /**
  * 导入根目录文件
@@ -12,7 +18,7 @@ import type { FontManagerOption } from "./FontManager";
  * @returns 返回文件木模块
  */
 export const importRootFile = async (fileName: string) => {
-    const backToCwdRelativePath = path.relative(path.dirname(__filename), process.cwd()); // 回退到 cwd 的地址字符，如 ../..
+    const backToCwdRelativePath = path.relative(path.dirname(_filename), process.cwd()); // 回退到 cwd 的地址字符，如 ../..
     const filePath = path.join(backToCwdRelativePath, fileName).split(path.sep).join(path.posix.sep); // 强制转换为 linux 下的正斜杠路径，遵循 javascript 模块地址标准
     return import(filePath);
 };

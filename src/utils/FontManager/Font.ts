@@ -4,7 +4,7 @@ import SVGIcons2SVGFontStream, { type Metadata } from "svgicons2svgfont";
 import svg2ttf from "svg2ttf";
 import ttf2woff2 from "ttf2woff2";
 import ttf2woff from "ttf2woff";
-import { getTypeDeclarationString, getCssString, getAbsolutePath } from "./utils";
+import { getTypeDeclarationString, getCssString, getAbsolutePath } from "./utils.js";
 
 export type FontType = "ttf" | "woff" | "woff2";
 

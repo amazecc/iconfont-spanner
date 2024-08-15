@@ -1,7 +1,7 @@
 import readline from "readline";
 import fs from "fs";
 import { glob } from "glob";
-import { getAbsolutePath } from "./utils";
+import { getAbsolutePath } from "./utils.js";
 import path from "path";
 
 /** 文件扫描文件夹配置 */

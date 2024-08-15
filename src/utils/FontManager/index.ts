@@ -1,8 +1,8 @@
 import path from "path";
-import { findRepeat, scanSvgFilePaths, getAbsolutePath } from "./utils";
-import { Font, type FontOption } from "./Font";
-import { Component, type ComponentOption } from "./Component";
-import { Scanner, type ScanOption } from "./Scanner";
+import { findRepeat, scanSvgFilePaths, getAbsolutePath } from "./utils.js";
+import { Font, type FontOption } from "./Font.js";
+import { Component, type ComponentOption } from "./Component.js";
+import { Scanner, type ScanOption } from "./Scanner.js";
 
 export interface FontManagerOption {
     /** svg 源文件夹 */

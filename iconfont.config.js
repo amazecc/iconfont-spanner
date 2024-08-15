@@ -1,14 +1,17 @@
-const path = require("path");
-const fs = require("fs");
-const prettier = require("prettier");
-const { getSvgTSReactComponentContent, toBigCamelCase } = require("./src");
+import path from "path";
+import fs from "fs";
+import prettier from "prettier";
+import { getSvgTSReactComponentContent, toBigCamelCase } from "./src/index.js";
+import { fileURLToPath } from "url";
+
+const _dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const formatCode = (code, parser) => {
-    return prettier.format(code, { ...JSON.parse(fs.readFileSync(path.resolve(__dirname, ".prettierrc"))).toString(), parser });
+    return prettier.format(code, { ...JSON.parse(fs.readFileSync(path.resolve(_dirname, ".prettierrc"))).toString(), parser });
 };
 
 /** @type {import('./src').FontManagerOption} */
-module.exports = {
+export default {
     resourceDir: "client/src/svg",
     output: {
         font: {
@@ -17,7 +20,7 @@ module.exports = {
             format: formatCode,
         },
         component: {
-            dir: "client/src/font/react-components",
+            dir: "client/src/font/components",
             fileFullName: fileName => `${toBigCamelCase(fileName.replace(/_oc$/, "_OC"))}.tsx`,
             name: fileName => toBigCamelCase(fileName.replace(/_oc$/, "_OC")),
             content: (...args) => formatCode(getSvgTSReactComponentContent(...args), "typescript"),
