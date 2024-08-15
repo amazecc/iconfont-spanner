@@ -46,7 +46,7 @@
     "scripts": {
         "start-server": "tsx bin-dev.ts start",
         "start-client": "cd client && pnpm run start",
-        "build-server": "tsc && tsc -p ./tsconfig.cjs.json",
+        "build-server": "tsc && tsc -p ./tsconfig.cjs.json && tsx ./script/transformDirFileName.ts",
         "build-client": "cd client && pnpm run build",
         "build-all": "rm -rf out && pnpm run build-server && pnpm run build-client",
         "clear-client": "rm -rf out/static",

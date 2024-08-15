@@ -9,16 +9,15 @@ import { fileURLToPath } from "url";
 
 const app = new Koa();
 
-const isCommonJS = typeof require !== "undefined" && typeof module !== "undefined";
 // @ts-ignore
-const _filename = isCommonJS ? __filename : fileURLToPath(import.meta.url);
-const _dirname = isCommonJS ? __dirname : path.dirname(_filename);
+const __FILENAME = fileURLToPath(import.meta.url);
+const __DIRNAME = path.dirname(__FILENAME);
 
 app.use(bodyParser())
     .use(cors())
     .use(router.routes())
     .use(router.allowedMethods())
-    .use(serve(path.resolve(_dirname, "../static")))
+    .use(serve(path.resolve(__DIRNAME, "../static")))
     .use(historyApiFallback);
 
 export const start = (port = 3000) => {
