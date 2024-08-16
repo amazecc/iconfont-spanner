@@ -57,7 +57,7 @@
         "premajor": "npm version premajor --preid=beta",
         "preminor": "npm version preminor --preid=beta",
         "prepatch": "npm version prepatch --preid=beta",
-        "prerelease": "npm version prerelease --preid=beta"
+        "publish": "tsx ./script/publish.ts"
     },
     "dependencies": {
         "@koa/bodyparser": "^5.1.1",
