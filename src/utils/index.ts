@@ -5,20 +5,13 @@ import { hideBin } from "yargs/helpers";
 import { exec } from "child_process";
 import { getPosixPath, scanSvgFilePaths } from "./FontManager/utils.js";
 import type { FontManagerOption } from "./FontManager/index.js";
-import { fileURLToPath } from "url";
-
-const __FILENAME = fileURLToPath(import.meta.url);
 
 /**
  * 导入根目录文件
  * @param fileName 根目录文件名,可以是嵌套文件
  * @returns 返回文件木模块
  */
-export const importRootFile = async (fileName: string) => {
-    const backToCwdRelativePath = path.relative(path.dirname(__FILENAME), process.cwd()); // 回退到 cwd 的地址字符，如 ../..
-    const filePath = getPosixPath(path.join(backToCwdRelativePath, fileName));
-    return import(filePath);
-};
+export const importRootFile = async (fileName: string) => import(getPosixPath(path.resolve(process.cwd(), fileName)));
 
 /** 导入配置项 */
 export const importConfig = async (): Promise<FontManagerOption> =>
