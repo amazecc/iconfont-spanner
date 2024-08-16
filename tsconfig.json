@@ -1,11 +1,35 @@
 {
-    "extends": "./tsconfig.base.json",
     "compilerOptions": {
+        "target": "ESNext",
+        "useDefineForClassFields": true,
+        "lib": ["ESNext", "DOM"],
         "module": "NodeNext",
-        "outDir": "out/esm",
+        "outDir": "out/server",
+        "skipLibCheck": true,
+        "removeComments": false,
+        "allowJs": true,
+        "declaration": true,
 
         /* Bundler mode */
         "moduleResolution": "NodeNext",
-        "esModuleInterop": true
-    }
+        "esModuleInterop": true,
+        "allowImportingTsExtensions": false,
+        "resolveJsonModule": true,
+        "allowSyntheticDefaultImports": true,
+        "isolatedModules": true,
+        "noEmit": false,
+
+        /* Linting */
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedIndexedAccess": true, // 通过下标获取元素，默认添加 undefined 类型
+        "forceConsistentCasingInFileNames": true, // 必须配置，严格区分导入文件大侠写
+        "noImplicitReturns": true, // 必须配置，若函数需要返回一个值，那么保证函数每个执行分支都存在返回值
+        "noImplicitOverride": true, // 必须配置，对父类方法的覆盖，使用 override 关键字指明
+        "exactOptionalPropertyTypes": false
+    },
+    "include": ["src"],
+    "exclude": ["node_modules", "client"]
 }

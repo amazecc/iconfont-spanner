@@ -7,7 +7,6 @@ import { scanSvgFilePaths } from "./FontManager/utils.js";
 import type { FontManagerOption } from "./FontManager/index.js";
 import { fileURLToPath } from "url";
 
-// @ts-ignore
 const __FILENAME = fileURLToPath(import.meta.url);
 
 /**
@@ -22,7 +21,10 @@ export const importRootFile = async (fileName: string) => {
 };
 
 /** 导入配置项 */
-export const importConfig = (): Promise<FontManagerOption> => importRootFile("iconfont.config.js").then(res => res.default);
+export const importConfig = async (): Promise<FontManagerOption> =>
+    importRootFile("iconfont.config.mjs")
+        .catch(() => importRootFile("iconfont.config.js"))
+        .then(config => config.default);
 
 /** 根据名称获取 svg 文件绝对地址 */
 export const getSvgFilePathByName = async (name: string) => {

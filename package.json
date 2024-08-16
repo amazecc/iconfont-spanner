@@ -4,21 +4,14 @@
     "description": "iconfont 本地管理服务",
     "type": "module",
     "bin": {
-        "iconfont": "bin.js"
+        "iconfont": "out/bin.mjs"
     },
-    "main": "./out/cjs/index.js",
-    "module": "./out/esm/index.js",
-    "types": "./out/esm/index.d.ts",
+    "module": "./out/server/index.js",
+    "types": "./out/server/index.d.ts",
     "exports": {
         ".": {
-            "require": {
-                "types": "./out/cjs/index.d.ts",
-                "default": "./out/cjs/index.js"
-            },
-            "import": {
-                "types": "./out/esm/index.d.ts",
-                "default": "./out/esm/index.js"
-            }
+            "types": "./out/server/index.d.ts",
+            "import": "./out/server/index.js"
         }
     },
     "files": [
@@ -44,21 +37,20 @@
     "author": "",
     "license": "MIT",
     "scripts": {
-        "start-server": "tsx bin-dev.ts start",
+        "start-server": "tsx src/bin.mts start",
         "start-client": "cd client && pnpm run start",
-        "build-server": "tsc && tsc -p ./tsconfig.cjs.json && tsx ./script/transformDirFileName.ts",
+        "build-server": "tsc",
         "build-client": "cd client && pnpm run build",
         "build-all": "rm -rf out && pnpm run build-server && pnpm run build-client",
         "clear-client": "rm -rf out/static",
-        "clear-server": "rm -rf out/cjs out/esm",
+        "clear-server": "rm -rf out/server",
         "major": "npm version major",
         "minor": "npm version minor",
         "patch": "npm version patch",
         "premajor": "npm version premajor --preid=beta",
         "preminor": "npm version preminor --preid=beta",
         "prepatch": "npm version prepatch --preid=beta",
-        "prerelease": "npm version prerelease --preid=beta",
-        "publish": "tsx ./script/publish.ts"
+        "prerelease": "npm version prerelease --preid=beta"
     },
     "dependencies": {
         "@koa/bodyparser": "^5.1.1",

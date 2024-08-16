@@ -11,15 +11,13 @@ interface CommandParams {
 
 const { array, object } = getCommandLineParams<[Command], CommandParams>();
 
-export const run = () => {
-    importConfig().then(config => {
-        FontManager.validate(config);
-        if (array[0] === "start") {
-            start(object.port);
-        } else {
-            const fontManager = new FontManager(config);
-            fontManager.read();
-            fontManager.generate();
-        }
-    });
-};
+importConfig().then(config => {
+    FontManager.validate(config);
+    if (array[0] === "start") {
+        start(object.port);
+    } else {
+        const fontManager = new FontManager(config);
+        fontManager.read();
+        fontManager.generate();
+    }
+});

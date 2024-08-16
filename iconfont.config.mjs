@@ -10,7 +10,7 @@ const formatCode = (code, parser) => {
     return prettier.format(code, { ...JSON.parse(fs.readFileSync(path.resolve(_dirname, ".prettierrc"))).toString(), parser });
 };
 
-/** @type {import('./src').FontManagerOption} */
+/** @type {import('./src/index.js').FontManagerOption} */
 export default {
     resourceDir: "client/src/svg",
     output: {

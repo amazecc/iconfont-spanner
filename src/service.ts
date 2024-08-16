@@ -9,7 +9,6 @@ import { fileURLToPath } from "url";
 
 const app = new Koa();
 
-// @ts-ignore
 const __FILENAME = fileURLToPath(import.meta.url);
 const __DIRNAME = path.dirname(__FILENAME);
 
