@@ -7,13 +7,20 @@ import type { ComponentOption } from "./Component.js";
 // ********************************************** node 工具函数 ***********************************************
 
 /**
+ * 转化为正斜杠路径
+ * @param filePath 文件地址
+ * @returns
+ */
+export const getPosixPath = (filePath: string) => filePath.split(path.sep).join(path.posix.sep);
+
+/**
  * 扫描文件地址
  * @param ext 文件扩展名
  * @param dir 文件夹中搜索，如果传相对地址，则基于 process.cwd() 查询
  * @returns 文件绝对地址
  */
 const scanFilePaths = (ext: string, dir = "") => {
-    return globSync(path.join(getAbsolutePath(dir), `**/*.${ext}`).split(path.sep).join(path.posix.sep));
+    return globSync(getPosixPath(path.join(getAbsolutePath(dir), `**/*.${ext}`)));
 };
 
 /**

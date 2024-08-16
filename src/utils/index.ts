@@ -3,7 +3,7 @@ import fs from "fs-extra";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { exec } from "child_process";
-import { scanSvgFilePaths } from "./FontManager/utils.js";
+import { getPosixPath, scanSvgFilePaths } from "./FontManager/utils.js";
 import type { FontManagerOption } from "./FontManager/index.js";
 import { fileURLToPath } from "url";
 
@@ -16,7 +16,7 @@ const __FILENAME = fileURLToPath(import.meta.url);
  */
 export const importRootFile = async (fileName: string) => {
     const backToCwdRelativePath = path.relative(path.dirname(__FILENAME), process.cwd()); // 回退到 cwd 的地址字符，如 ../..
-    const filePath = path.join(backToCwdRelativePath, fileName).split(path.sep).join(path.posix.sep); // 强制转换为 linux 下的正斜杠路径，遵循 javascript 模块地址标准
+    const filePath = getPosixPath(path.join(backToCwdRelativePath, fileName));
     return import(filePath);
 };
 
@@ -58,15 +58,15 @@ export const renameFile = async (oldPath: string, newPath: string) => {
     const newFileName = path.basename(newPath);
 
     if (oldFileName !== newFileName && oldFileName.toLocaleLowerCase() === newFileName.toLocaleLowerCase()) {
-        await execCommand(`git mv ${oldPath} ${newPath}`)
+        await execCommand(`git mv ${getPosixPath(oldPath)} ${getPosixPath(newPath)}`)
             .then(() => {
-                console.log(`[rename]: ${oldFileName} -> ${newFileName}（大小写变化，追加 git mv 处理）`);
+                console.log(`[rename]: ${oldFileName} -> ${newFileName} 成功，大小写变化，追加 git mv 处理`);
             })
             .catch(() => {
                 // 不做处理
             });
     } else {
-        console.log(`[rename]: ${oldFileName} -> ${newFileName}`);
+        console.log(`[rename]: ${oldFileName} -> ${newFileName} 成功`);
     }
 };
 
