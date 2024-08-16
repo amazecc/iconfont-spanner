@@ -10,9 +10,9 @@ npm i -D iconfont-spanner
 
 ## 使用
 
-1. 项目根目录新建配置文件 `iconfont.config.js`
-2. 执行 `npx iconfont` 生成 iconfont, 或
-3. 执行 `npx iconfont start` 启动本地服务，访问地址将在终端显示，打开地址可对图标进行编辑删除，重新生成 iconfont 操作。
+1. 如果项目为 `commonjs` 模块，根目录必须创建 `iconfont.config.mjs`，`ESModule` 模块则 `.mjs`,`.js` 都支持
+2. `npx iconfont` 将 `SVG` 转化为 `iconfont` 或者组件, 或
+3. `npx iconfont start` 启动本地服务，访问地址将在终端显示，打开地址可对图标进行编辑删除，重新生成 `iconfont` 操作。
 
 ![alt text](spanner.png)
 
@@ -20,9 +20,7 @@ npm i -D iconfont-spanner
 # 终端转化
 npx iconfont
 # 启动服务，网页操作，包括增删改查，查询使用情况，转化等功能
-npx iconfont start
-# 启动服务，网页操作，指定端口
-npx iconfont start --port 8080
+npx iconfont start [--port 8080]
 ```
 
 ## 功能
@@ -36,68 +34,50 @@ npx iconfont start --port 8080
     -   [x] 编辑名称
     -   [x] 字体(font)与 svg 实时预览
     -   [x] 扫描引用情况
--   [x] commonjs 支持
--   [ ] ES Module 支持
 
 ## 配置说明
 
-1. 只生成字体
+1. 文件名
+
+    - commonjs: `iconfont.config.[m]js`
+    - ESModule: `iconfont.config.js` 或 `iconfont.config.mjs`
+
+2. 配置内容
 
 ```javascript
-const path = require("path");
-const fs = require("fs");
-const prettier = require("prettier");
-const { getSvgTSReactComponentContent, toBigCamelCase } = require("iconfont-spanner");
-
-const formatCode = (code, parser) => {
-    return prettier.format(code, { ...JSON.parse(fs.readFileSync(path.resolve(__dirname, ".prettierrc"))).toString(), parser });
-};
+import { getSvgTSReactComponentContent, toBigCamelCase } from "iconfont-spanner";
 
 /** @type {import('iconfont-spanner').FontManagerOption} */
-module.exports = {
-    resourceDir: "src/assets/svgs",
+export default {
+    resourceDir: "src/svg",
     output: {
+        // 生成和字体
         font: {
-            dir: "src/assets/font",
+            dir: "src/font",
             name: "iconfont",
-            types: ["ttf", "woff", "woff2"], // 配置生成的字体类型，默认 ["ttf", "woff", "woff2"]
-            format: formatCode,
+            types: ["ttf", "woff", "woff2"],
         },
-    },
-};
-```
-
-2. 只生成组件，这里以 react 组件为例
-
-```javascript
-const path = require("path");
-const fs = require("fs");
-const prettier = require("prettier");
-const { getSvgTSReactComponentContent, toBigCamelCase } = require("iconfont-spanner");
-
-const formatCode = (code, parser) => {
-    return prettier.format(code, { ...JSON.parse(fs.readFileSync(path.resolve(__dirname, ".prettierrc"))).toString(), parser });
-};
-
-/** @type {import('iconfont-spanner').FontManagerOption} */
-module.exports = {
-    resourceDir: path.join(__dirname, "src/assets/svgs"),
-    output: {
+        // 转化为组件，比如 react 组件
         component: {
-            dir: "src/assets/font",
-            fileFullName: fileName => `Svg${toBigCamelCase(fileName)}.tsx`, // 组件文件名称
-            name: fileName => `Svg${toBigCamelCase(fileName)}`, // 组件名称
-            content: (...args) => formatCode(getSvgTSReactComponentContent(...args), "typescript"), // 组件代码内容, 并格式化
-            fillCurrentColor: fileName => !fileName.endsWith("_oc"), // 文件名以 _oc 结尾的 svg 组件不清除颜色，如：icon_oc.svg
+            dir: "src/font/components",
+            fileFullName: fileName => `${toBigCamelCase(fileName)}.tsx`,
+            name: fileName => toBigCamelCase(fileName),
+            content: getSvgTSReactComponentContent,
+            fillCurrentColor: fileName => !fileName.endsWith("_oc"),
         },
+    },
+    // 扫描引用情况
+    scan: {
+        includes: ["src/**/*.{ts,tsx,js,jsx}"],
+        excludes: ["src/font/**/*", "**/*.d.ts"], // 需要明确排除的文件，这会影响到扫描结果
     },
 };
 ```
 
-可自定义组件代码内容，已内置两个组件生成函数：
+3. 可自定义组件代码内容，已内置两个组件生成函数：
 
--   `getSvgTSReactComponentContent`,
--   `getSvgJSReactComponentContent`
+    - `getSvgTSReactComponentContent`,
+    - `getSvgJSReactComponentContent`
 
 ```tsx
 export const getSvgTSReactComponentContent = (name, svgString) => {
@@ -115,51 +95,6 @@ export const ${name} = (props: ${name}Props) => {
 };
 ```
 
-3. 检查图标在项目中的引用情况
-
-```javascript
-const path = require("path");
-const fs = require("fs");
-const prettier = require("prettier");
-const { getSvgTSReactComponentContent, toBigCamelCase } = require("iconfont-spanner");
-
-const formatCode = (code, parser) => {
-    return prettier.format(code, { ...JSON.parse(fs.readFileSync(path.resolve(__dirname, ".prettierrc"))).toString(), parser });
-};
-
-/** @type {import('iconfont-spanner').FontManagerOption} */
-module.exports = {
-    resourceDir: path.join(__dirname, "src/assets/svgs"),
-    output: {
-        component: {
-            dir: "src/assets/font",
-            fileFullName: fileName => `Svg${toBigCamelCase(fileName)}.tsx`, // 组件文件名称
-            name: fileName => `Svg${toBigCamelCase(fileName)}`, // 组件名称
-            content: (...args) => formatCode(getSvgTSReactComponentContent(...args), "typescript"), // 组件代码内容, 并格式化
-            fillCurrentColor: fileName => !fileName.endsWith("_oc"), // 文件名以 _oc 结尾的 svg 组件不清除颜色，如：icon_oc.svg
-        },
-    },
-    // <------------------
-    scan: {
-        // rootDir: process.cwd(), // 文件扫描根目录，默认 process.cwd()
-        includes: ["src/**/*.{ts,tsx,js,jsx}"], // 扫描的文件
-        excludes: ["src/assets/font/**/*", "**/*.d.ts"], // 排除的文件，一般会排除掉输出目录（output.dir）
-    },
-};
-```
-
-4. 支持同时生成字体与 svg 组件
-
 ## 输出内容
 
-### 字体（font）
-
--   `{font.name}.ttf`
--   `{font.name}.woff`
--   `{font.name}.woff2`
--   `{font.name}.css` (可以引用到页面使用)
--   `{font.name}.ts` (含有类型声明，可根据这个文件封装 typescript 组件)
-
-### 组件
-
-根据文件名生成的 svg 组件
+![alt text](output.jpg)
