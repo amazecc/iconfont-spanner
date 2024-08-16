@@ -4,7 +4,7 @@
     "description": "iconfont 本地管理服务",
     "type": "module",
     "bin": {
-        "iconfont": "out/bin.mjs"
+        "iconfont": "out/server/bin.mjs"
     },
     "module": "./out/server/index.js",
     "types": "./out/server/index.d.ts",
