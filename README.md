@@ -10,7 +10,7 @@ npm i -D iconfont-spanner
 
 ## 使用
 
-1. 如果项目为 `commonjs` 模块，根目录必须创建 `iconfont.config.mjs`，`ESModule` 模块则 `.mjs`,`.js` 都支持
+1. 根目录创建 `iconfont.config.mjs`
 2. `npx iconfont` 将 `SVG` 转化为 `iconfont` 或者组件, 或
 3. `npx iconfont start` 启动本地服务，访问地址将在终端显示，打开地址可对图标进行编辑删除，重新生成 `iconfont` 操作。
 
@@ -39,8 +39,8 @@ npx iconfont start [--port 8080]
 
 1. 文件名
 
-    - commonjs: `iconfont.config.[m]js`
-    - ESModule: `iconfont.config.js` 或 `iconfont.config.mjs`
+    - commonjs: `iconfont.config.mjs`
+    - ESModule: `iconfont.config.[m]js`
 
 2. 配置内容
 
