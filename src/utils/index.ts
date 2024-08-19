@@ -1,3 +1,4 @@
+import { pathToFileURL } from "url";
 import path from "path";
 import fs from "fs-extra";
 import yargs from "yargs";
@@ -11,7 +12,7 @@ import type { FontManagerOption } from "./FontManager/index.js";
  * @param fileName 根目录文件名,可以是嵌套文件
  * @returns 返回文件木模块
  */
-export const importRootFile = async (fileName: string) => import(getPosixPath(path.resolve(process.cwd(), fileName)));
+export const importRootFile = async (fileName: string) => import(pathToFileURL(getPosixPath(path.resolve(process.cwd(), fileName))).href);
 
 /** 导入配置项 */
 export const importConfig = async (): Promise<FontManagerOption> =>
