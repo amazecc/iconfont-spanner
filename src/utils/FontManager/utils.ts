@@ -126,8 +126,17 @@ export const ${toCamelCase(fontName)}HTMLUnicode = {
 `;
 };
 
+export const getDefaultFontStyle = (fontName: string) => {
+    return `
+	font-family: "${fontName}" !important;
+	font-style: normal;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+`;
+};
+
 /** 生成 css 文件 */
-export const getCssString = (fontName: string, fontTypes: FontType[], metadata: FontMetadata[]) => {
+export const getCssString = (fontName: string, fontTypes: FontType[], style: (fontName: string) => string, metadata: FontMetadata[]) => {
     const now = Date.now();
     return `
 @font-face {
@@ -141,13 +150,7 @@ export const getCssString = (fontName: string, fontTypes: FontType[], metadata: 
         .join(",\n\t\t")};
 }
 
-.${fontName} {
-    font-family: "${fontName}" !important;
-    font-size: 16px;
-    font-style: normal;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
+.${fontName} {${style(fontName)}}
 ${metadata
     .map(item => {
         return `

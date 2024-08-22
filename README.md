@@ -44,6 +44,8 @@ npx iconfont start [--port 8080]
 
 2. 配置内容
 
+以下配置为全部字段，具体是否可选可参考类型定义
+
 ```javascript
 import { getSvgTSReactComponentContent, toBigCamelCase } from "iconfont-spanner";
 
@@ -53,16 +55,36 @@ export default {
     output: {
         // 生成和字体
         font: {
+            // 输出目录
             dir: "src/font",
+            // 字体名称
             name: "iconfont",
+            // 生成的字体格式，支持 "ttf", "woff", "woff2"
             types: ["ttf", "woff", "woff2"],
+            // 格式化输出内容，type 为 "css" | "typescript"
+            format: (content, type) => content, // 可以使用格式化程序处理 content
+            // 自定义字体样式
+            style: fontName => {
+                return `
+					font-family: "${fontName}" !important; // 默认
+					font-style: normal; // 默认
+					-webkit-font-smoothing: antialiased; // 默认
+					-moz-osx-font-smoothing: grayscale; // 默认
+					font-size: 1em; // ------> 自定义样式
+				`;
+            },
         },
         // 转化为组件，比如 react 组件
         component: {
+            // 输出目录
             dir: "src/font/components",
+            // 组件文件名，需要带上文件扩展名
             fileFullName: fileName => `${toBigCamelCase(fileName)}.tsx`,
+            // 组件名称
             name: fileName => toBigCamelCase(fileName),
+            // 组件内容
             content: getSvgTSReactComponentContent,
+            // 是否使用 currentColor 填充 svg fill 属性，如果不填充，则保留原色，可以用来实现彩色图标
             fillCurrentColor: fileName => !fileName.endsWith("_oc"),
         },
     },

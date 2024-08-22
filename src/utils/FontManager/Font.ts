@@ -4,7 +4,7 @@ import SVGIcons2SVGFontStream, { type Metadata } from "svgicons2svgfont";
 import svg2ttf from "svg2ttf";
 import ttf2woff2 from "ttf2woff2";
 import ttf2woff from "ttf2woff";
-import { getTypeDeclarationString, getCssString, getAbsolutePath } from "./utils.js";
+import { getTypeDeclarationString, getCssString, getAbsolutePath, getDefaultFontStyle } from "./utils.js";
 
 export type FontType = "ttf" | "woff" | "woff2";
 
@@ -18,7 +18,24 @@ export interface FontOption {
      * @default ["ttf", "woff", "woff2"]
      */
     types?: FontType[];
-    /** 针对生成文件内容进行格式化 */
+    /**
+     * 自定义字体样式
+     * @param name 字体名称
+     * @returns css 样式字符串
+     * @default
+     * ```tsx
+     * (name: string) => {
+     * 	return `
+     * 		font-family: "${name}" !important;
+     * 		font-style: normal;
+     * 		-webkit-font-smoothing: antialiased;
+     * 		-moz-osx-font-smoothing: grayscale;
+     * `;
+     * }
+     * ```
+     */
+    style?: (name: string) => string;
+    /** 可针对生成文件内容进行格式化 */
     format?: (content: string, type: "css" | "typescript") => string | Promise<string>;
 }
 
@@ -55,6 +72,7 @@ export class Font {
         this.option = {
             types: ["ttf", "woff", "woff2"],
             format: content => content,
+            style: getDefaultFontStyle,
             ...option,
             dir: getAbsolutePath(option.dir),
         };
@@ -105,8 +123,8 @@ export class Font {
 
     /** 写入 css 文件 */
     private async writeCSSFile() {
-        const { name, types, format } = this.option;
-        const cssString = await format(getCssString(name, types, this.metadata), "css");
+        const { name, types, format, style } = this.option;
+        const cssString = await format(getCssString(name, types, style, this.metadata), "css");
         fs.writeFileSync(this.getOutputPath("css"), cssString);
     }
 
