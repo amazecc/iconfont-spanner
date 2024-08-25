@@ -63,14 +63,14 @@ export default {
             types: ["ttf", "woff", "woff2"],
             // 格式化输出内容，type 为 "css" | "typescript"
             format: (content, type) => content, // 可以使用格式化程序处理 content
-            // 自定义字体样式
+            // 自定义字体样式，会添加到 iconfont.css中，用来设定大小和颜色等，1em为继承父级的font-size
             style: fontName => {
                 return `
-					font-family: "${fontName}" !important; // 默认
-					font-style: normal; // 默认
-					-webkit-font-smoothing: antialiased; // 默认
-					-moz-osx-font-smoothing: grayscale; // 默认
-					font-size: 1em; // ------> 自定义样式
+					font-family: "${fontName}" !important; /*默认*/
+					font-style: normal; /* 默认 */
+					-webkit-font-smoothing: antialiased; /* 默认 */
+					-moz-osx-font-smoothing: grayscale; /* 默认 */
+					font-size: 1em; /* 自定义样式 */
 				`;
             },
         },
