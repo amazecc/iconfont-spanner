@@ -41,7 +41,6 @@ export const EditableText: React.FC<EditableTextProps> = React.memo(props => {
         <Input
             size="small"
             autoFocus
-            style={{ textAlign: "center" }}
             {...restInputProps}
             defaultValue={defaultValue}
             onKeyUp={e => {

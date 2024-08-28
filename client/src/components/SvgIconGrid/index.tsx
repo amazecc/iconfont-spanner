@@ -21,22 +21,20 @@ const SvgIconGrid: React.FC<SvgIconGridProps> = React.memo(({ metadata, usage, o
                 return (
                     <FontCard
                         key={item.fileName}
-                        className={classnames(unusedIconName.has(item.fileName) && "bg-slate-200")}
+                        className={classnames("cursor-copy", unusedIconName.has(item.fileName) && "bg-slate-200")}
                         name={item.fileName}
-                        subName={item.name}
-                        icon={
-                            <span
-                                className="cursor-copy text-[52px]  leading-none"
-                                dangerouslySetInnerHTML={{ __html: item.svgOptimizeString }}
-                                onClick={() => {
-                                    navigator.clipboard.writeText(`<${item.name} />`).then(() => {
-                                        message.success("已复制到剪贴板");
-                                    });
-                                }}
-                            />
-                        }
+                        subName={{
+                            value: `<${item.name} />`,
+                            tip: "组件名称，点击复制",
+                        }}
+                        icon={<span className="text-[52px] leading-none" dangerouslySetInnerHTML={{ __html: item.svgOptimizeString }} />}
                         onClickRemove={() => onRemove?.(item.fileName)}
                         onEditConfirm={value => onRename?.(item.fileName, value)}
+                        onClick={() => {
+                            navigator.clipboard.writeText(`<${item.name} />`).then(() => {
+                                message.success(`已复制 <${item.name} /> 到剪贴板`);
+                            });
+                        }}
                     />
                 );
             })}

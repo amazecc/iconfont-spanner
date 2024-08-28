@@ -92,7 +92,7 @@ const App = () => {
                                                 </div>
                                             }
                                         >
-                                            <span className="ml-3 text-red-600">
+                                            <span className="ml-3">
                                                 <InfoCircleOutlined />
                                             </span>
                                         </Tooltip>

@@ -121,17 +121,17 @@ export type ${toBigCamelCase(fontName)}ClassName = ${metadata.map(font => `"${fo
 
 /** unicode 编码集合，在 html 中显示 */
 export const ${toCamelCase(fontName)}HTMLUnicode = {
-	${metadata.map(item => `"${item.fileName}": "${getUnicodeDisplayString(item.unicodeHex, "html")}"`).join(",\n\t")}
+    ${metadata.map(item => `"${item.fileName}": "${getUnicodeDisplayString(item.unicodeHex, "html")}"`).join(",\n\t")}
 }
 `;
 };
 
 export const getDefaultFontStyle = (fontName: string) => {
     return `
-	font-family: "${fontName}" !important;
-	font-style: normal;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+    font-family: "${fontName}" !important;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 `;
 };
 
@@ -147,7 +147,7 @@ export const getCssString = (fontName: string, fontTypes: FontType[], style: (fo
         fontTypes.includes("woff2") && `url("${fontName}.woff2?t=${now}") format("woff2")`,
     ]
         .filter(Boolean)
-        .join(",\n\t\t")};
+        .join(",\n")};
 }
 
 .${fontName} {${style(fontName)}}
@@ -155,7 +155,7 @@ ${metadata
     .map(item => {
         return `
 .${item.fileName}::before {
-	content: "${getUnicodeDisplayString(item.unicodeHex, "css")}";
+    content: "${getUnicodeDisplayString(item.unicodeHex, "css")}";
 }`;
     })
     .join("\n")}
@@ -170,9 +170,9 @@ export const getSvgTSReactComponentContent: ComponentOption["content"] = (name, 
 export interface ${name}Props extends React.SVGAttributes<SVGSVGElement> {}
 
 export const ${name} = (props: ${name}Props) => {
-	return (
-		${svgString.replace(/<svg.+?>/gm, item => `${item.slice(0, item.length - 1)} {...props}>`)}
-	)
+    return (
+        ${svgString.replace(/<svg.+?>/gm, item => `${item.slice(0, item.length - 1)} {...props}>`)}
+    )
 };
 `;
 };
@@ -183,9 +183,9 @@ export const getSvgJSReactComponentContent: ComponentOption["content"] = (name, 
 /* eslint-disable */
 
 export const ${name} = (props) => {
-	return (
-		${svgString.replace(/<svg.+?>/gm, item => `${item.slice(0, item.length - 1)} {...props}>`)}
-	)
+    return (
+        ${svgString.replace(/<svg.+?>/gm, item => `${item.slice(0, item.length - 1)} {...props}>`)}
+    )
 };
 `;
 };

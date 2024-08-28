@@ -25,20 +25,20 @@ const FontIconGrid: React.FC<FontIconGridProps> = React.memo(({ metadata, usage,
                     return (
                         <FontCard
                             key={item.fileName}
-                            className={classnames(unusedIconName.has(item.fileName) && "bg-slate-200", usedIconName.has(item.fileName) && "bg-green-200")}
+                            className={classnames("cursor-copy", unusedIconName.has(item.fileName) && "bg-slate-200", usedIconName.has(item.fileName) && "bg-green-200")}
                             name={item.fileName}
-                            icon={
-                                <span
-                                    className={`iconfont cursor-copy text-[52px] leading-none ${item.fileName}`}
-                                    onClick={() => {
-                                        navigator.clipboard.writeText(item.fileName).then(() => {
-                                            message.success("已复制到剪贴板");
-                                        });
-                                    }}
-                                />
-                            }
+                            subName={{
+                                value: item.fileName,
+                                tip: "字体样式类，点击复制",
+                            }}
+                            icon={<span className={`iconfont text-[52px] leading-none ${item.fileName}`} />}
                             onClickRemove={() => onRemove?.(item.fileName)}
                             onEditConfirm={value => onRename?.(item.fileName, value)}
+                            onClick={() => {
+                                navigator.clipboard.writeText(item.fileName).then(() => {
+                                    message.success("已复制到剪贴板");
+                                });
+                            }}
                         />
                     );
                 })}
