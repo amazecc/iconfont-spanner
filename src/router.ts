@@ -102,21 +102,21 @@ router.get("/api/scan", async ctx => {
     const config = await importConfig();
 
     const fontManager = new FontManager(config);
-    const { scanner } = fontManager;
+    const { scanner, font, component } = fontManager;
     fontManager.read();
     if (scanner) {
         const getFontUsage = () => {
-            if (fontManager.font) {
-                return scanner.scanUsage(fontManager.font.metadata.map(metadata => metadata.fileName));
+            if (font) {
+                return scanner.scanUsage(font.metadata.map(metadata => metadata.fileName));
             }
             return undefined;
         };
         const getSvgUsage = async () => {
-            if (fontManager.component) {
-                const svgUsage = await scanner.scanUsage(fontManager.component.metadata.map(metadata => metadata.name));
+            if (component) {
+                const svgUsage = await scanner.scanUsage(component.metadata.map(metadata => metadata.name));
                 return {
-                    used: fontManager.component.metadata.filter(metadata => svgUsage.used.includes(metadata.name)).map(item => item.fileName),
-                    unused: fontManager.component.metadata.filter(metadata => svgUsage.unused.includes(metadata.name)).map(item => item.fileName),
+                    used: component.metadata.filter(metadata => svgUsage.used.includes(metadata.name)).map(item => item.fileName),
+                    unused: component.metadata.filter(metadata => svgUsage.unused.includes(metadata.name)).map(item => item.fileName),
                 };
             }
             return undefined;
@@ -125,7 +125,7 @@ router.get("/api/scan", async ctx => {
         ctx.body = {
             success: true,
             data:
-                config.output.font || config.output.component
+                font || component
                     ? {
                           font: await getFontUsage(),
                           component: await getSvgUsage(),
@@ -138,6 +138,41 @@ router.get("/api/scan", async ctx => {
             message: "请配置扫描目录",
         };
     }
+});
+
+router.post("/api/prefix", async ctx => {
+    const config = await importConfig();
+    const newPrefix = ctx.request.body.newPrefix as string;
+    const oldPrefix = ctx.request.body.oldPrefix as string;
+    const paths = scanSvgFilePaths(config.resourceDir)
+        .filter(item => {
+            const fileFullName = path.basename(item);
+            // 1. 提取需要替换旧前缀，或者与新前缀不等的项
+            return fileFullName.startsWith(oldPrefix) || !fileFullName.startsWith(newPrefix);
+        })
+        .map(item => {
+            const dirname = path.dirname(item);
+            const fileFullName = path.basename(item);
+            const caseRegex = new RegExp(`^${newPrefix}`, "i");
+            const isDifferentCase = caseRegex.test(fileFullName);
+
+            const newFileFullName =
+                oldPrefix && fileFullName.startsWith(oldPrefix)
+                    ? fileFullName.replace(new RegExp(`^${oldPrefix}`), newPrefix) // 2. 替换旧前缀
+                    : isDifferentCase
+                      ? fileFullName.replace(caseRegex, newPrefix) // 3. 前缀大小写替换
+                      : `${newPrefix}${fileFullName}`; // 4. 添加新前缀
+
+            return {
+                oldPath: item,
+                newPath: path.join(dirname, newFileFullName),
+            };
+        });
+    console.log("aaaaaa", paths);
+    for (const { oldPath, newPath } of paths) {
+        await renameFile(oldPath, newPath);
+    }
+    ctx.status = 204;
 });
 
 router.get("/api/ttf", async ctx => {

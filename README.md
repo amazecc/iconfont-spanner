@@ -120,3 +120,24 @@ export const ${name} = (props: ${name}Props) => {
 ## 输出内容
 
 ![alt text](output.jpg)
+
+## 问题
+
+1. 在 `windows` 系统中，有时为什么会操作失败？比如修改名称，转化等功能
+
+    如果终端显示了以下类似的错误，一般来讲，输出文件被当前项目开发服务器所引用，从而被系统锁定，无法删除也无法覆盖，这时候可以尝试关掉项目的开发服务器在尝试。
+
+    ```log
+    Error: EPERM: operation not permitted, lstat '\\?\D:\WorksCode\tianshu-web\src\assets\fonts\iconfont.ttf'
+        at lstatSync (node:fs:1666:3)
+        at rimrafSync (node:internal/fs/rimraf:180:13)
+        at node:internal/fs/rimraf:253:9
+        at Array.forEach (<anonymous>)
+        at _rmdirSync (node:internal/fs/rimraf:250:7)
+        at fixWinEPERMSync (node:internal/fs/rimraf:304:5)
+        at rimrafSync (node:internal/fs/rimraf:200:14)
+        at Object.rmSync (node:fs:1271:10)
+        at Object.removeSync (D:\WorksCode\tianshu-web\node_modules\iconfont-spanner\node_modules\fs-extra\lib\remove\index.js:11:6)
+        at file:///D:/WorksCode/tianshu-web/node_modules/iconfont-spanner/out/server/router.js:32:12
+
+    ```

@@ -13,6 +13,7 @@ import { scanIcon, type FontUsage } from "./api/scanIcon";
 import { UploadModal } from "./components/UploadModal";
 import { AutoLoadingButton } from "./components/basic/AutoLoadingButton";
 import "./globals.css";
+import { UpdatePrefixModal } from "./components/UpdatePrefixModal";
 
 dayjs.locale("zh-cn");
 
@@ -25,6 +26,7 @@ const App = () => {
     const [usage, setUsage] = React.useState<FontUsage | null>(null);
 
     const [open, { setFalse, setTrue }] = useBoolean();
+    const [prefixModalOpen, { setFalse: closePrefixModal, setTrue: openPrefixModal }] = useBoolean();
 
     const fetchList = () => getIconList().then(res => setData(res));
 
@@ -127,6 +129,9 @@ const App = () => {
                                             扫描
                                         </AutoLoadingButton>
                                     </div>
+                                    <Button icon={<PlusOutlined />} type="primary" onClick={openPrefixModal}>
+                                        设置前缀
+                                    </Button>
                                     <Button icon={<PlusOutlined />} type="primary" onClick={setTrue}>
                                         添加
                                     </Button>
@@ -140,6 +145,14 @@ const App = () => {
                         }}
                     />
                     <UploadModal open={open} onClose={setFalse} onSuccess={fetchList} />
+                    <UpdatePrefixModal
+                        open={prefixModalOpen}
+                        onClose={closePrefixModal}
+                        onSuccess={() => {
+                            closePrefixModal();
+                            fetchList();
+                        }}
+                    />
                 </div>
             </Suspense>
         </ConfigProvider>
