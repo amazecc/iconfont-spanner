@@ -32,6 +32,7 @@ export const FontCard: React.FC<FontCardProps> = React.memo(props => {
             {icon}
             <EditableText
                 className="text-center font-semibold leading-7"
+                onClick={e => e.stopPropagation()}
                 onConfirm={async value => {
                     if (value) {
                         onEditConfirm?.(value);
