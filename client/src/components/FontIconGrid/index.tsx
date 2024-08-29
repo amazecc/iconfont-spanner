@@ -20,7 +20,7 @@ const FontIconGrid: React.FC<FontIconGridProps> = React.memo(({ metadata, usage,
     return (
         <>
             <FontStyle metadata={metadata} />
-            <div className=" grid grid-cols-6 gap-3">
+            <div className=" grid grid-cols-5 gap-3">
                 {metadata.map(item => {
                     return (
                         <FontCard
@@ -36,7 +36,7 @@ const FontIconGrid: React.FC<FontIconGridProps> = React.memo(({ metadata, usage,
                             onEditConfirm={value => onRename?.(item.fileName, value)}
                             onClick={() => {
                                 navigator.clipboard.writeText(item.fileName).then(() => {
-                                    message.success("已复制到剪贴板");
+                                    message.success(`已复制 ${item.fileName} 剪贴板`);
                                 });
                             }}
                         />

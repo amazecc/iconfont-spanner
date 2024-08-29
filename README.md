@@ -96,26 +96,70 @@ export default {
 };
 ```
 
-3. 可自定义组件代码内容，已内置两个组件生成函数：
+3. 可自定义组件代码内容
 
-    - `getSvgTSReactComponentContent`,
-    - `getSvgJSReactComponentContent`
+    1. 内置两个 `react` 组件生成函数
 
-```tsx
-export const getSvgTSReactComponentContent = (name, svgString) => {
-    return `
-/* eslint-disable */
+        - `getSvgTSReactComponentContent`,
+        - `getSvgJSReactComponentContent`
 
-export interface ${name}Props extends React.SVGAttributes<SVGSVGElement> {}
+        ```tsx
+        export const getSvgTSReactComponentContent = (name, svgString) => {
+            return `
+        /* eslint-disable */
+        
+        export interface ${name}Props extends React.SVGAttributes<SVGSVGElement> {}
+        
+        export const ${name} = (props: ${name}Props) => {
+            return (
+                ${svgString.replace(/<svg.+?>/gm, item => `${item.slice(0, item.length - 1)} {...props}>`)}
+            )
+        };
+        `;
+        };
+        ```
 
-export const ${name} = (props: ${name}Props) => {
-    return (
-        ${svgString.replace(/<svg.+?>/gm, item => `${item.slice(0, item.length - 1)} {...props}>`)}
-    )
-};
-`;
-};
-```
+    2. `vue` 组件根据自己需要自行编写，如：
+
+        ```js
+        const getSvgJSVueComponentContent = (name, svgString) => {
+            return `
+        <template>
+        ${svgString.replace(/<svg.+?>/gm, item => `${item.slice(0, item.length - 1)} v-bind="$attrs">`)}
+        </template>
+        
+        <script lang="ts">
+        import { defineComponent } from 'vue';
+        
+        export default defineComponent({
+            name: '${name}',
+            inheritAttrs: false
+        });
+        </script>
+        
+        <style scoped>
+        </style>
+        `;
+        };
+        ```
+
+        可以使用 [unplugin-vue-components](https://www.npmjs.com/package/unplugin-vue-components) 来实现输出组件的自动导入
+
+        ```ts
+        import { defineConfig } from "vite";
+        import vue from "@vitejs/plugin-vue";
+        import Components from "unplugin-vue-components/vite";
+
+        // https://vitejs.dev/config/
+        export default defineConfig({
+            plugins: [
+                vue(),
+                Components({
+                    dirs: ["src/font/components"], // <-------- 输出目录
+                }),
+            ],
+        });
+        ```
 
 ## 输出内容
 

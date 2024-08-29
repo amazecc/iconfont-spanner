@@ -12,10 +12,10 @@ const app = new Koa();
 const __FILENAME = fileURLToPath(import.meta.url);
 const __DIRNAME = path.dirname(__FILENAME);
 
-app.use(bodyParser())
+app.use(router.allowedMethods())
+    .use(bodyParser())
     .use(cors())
     .use(router.routes())
-    .use(router.allowedMethods())
     .use(serve(path.resolve(__DIRNAME, "../static")))
     .use(historyApiFallback);
 

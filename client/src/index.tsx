@@ -2,7 +2,7 @@ import React, { useEffect, Suspense, lazy } from "react";
 import ReactDOM from "react-dom/client";
 import dayjs from "dayjs";
 import { Button, ConfigProvider, message, Modal, Tabs, Tooltip } from "antd";
-import { InfoCircleOutlined, PlusOutlined, RadarChartOutlined, RetweetOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined, PlusOutlined, RadarChartOutlined, RetweetOutlined, VerticalLeftOutlined } from "@ant-design/icons";
 import { useBoolean } from "ahooks";
 import zhCN from "antd/locale/zh_CN";
 import { getIconList, type FontData } from "./api/getIconList";
@@ -129,7 +129,7 @@ const App = () => {
                                             扫描
                                         </AutoLoadingButton>
                                     </div>
-                                    <Button icon={<PlusOutlined />} type="primary" onClick={openPrefixModal}>
+                                    <Button icon={<VerticalLeftOutlined />} type="primary" onClick={openPrefixModal}>
                                         设置前缀
                                     </Button>
                                     <Button icon={<PlusOutlined />} type="primary" onClick={setTrue}>

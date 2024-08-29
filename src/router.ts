@@ -168,7 +168,6 @@ router.post("/api/prefix", async ctx => {
                 newPath: path.join(dirname, newFileFullName),
             };
         });
-    console.log("aaaaaa", paths);
     for (const { oldPath, newPath } of paths) {
         await renameFile(oldPath, newPath);
     }

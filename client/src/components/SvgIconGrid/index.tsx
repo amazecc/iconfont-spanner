@@ -16,7 +16,7 @@ const SvgIconGrid: React.FC<SvgIconGridProps> = React.memo(({ metadata, usage, o
     const unusedIconName = React.useMemo(() => new Set(usage?.unused), [usage]);
 
     return (
-        <div className=" grid grid-cols-6 gap-3">
+        <div className=" grid grid-cols-5 gap-3">
             {metadata.map(item => {
                 return (
                     <FontCard

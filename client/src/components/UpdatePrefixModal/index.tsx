@@ -1,5 +1,5 @@
 import React from "react";
-import { message, Modal, Form, Input } from "antd";
+import { message, Modal, Form, Input, Alert } from "antd";
 import { updatePrefix } from "src/api/updatePrefix";
 import { isValidFontName } from "src/utils";
 
@@ -28,6 +28,7 @@ export const UpdatePrefixModal: React.FC<UpdatePrefixModalProps> = React.memo(({
 
     return (
         <Modal title="设置前缀" open={open} onCancel={onClose} onOk={submit} afterClose={reset}>
+            <Alert type="info" message="注：修改前缀后，同时会修改文件名称" className="mb-6 mt-4 text-slate-500" />
             <Form form={form} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
                 <Form.Item
                     label="新前缀"
@@ -41,14 +42,14 @@ export const UpdatePrefixModal: React.FC<UpdatePrefixModalProps> = React.memo(({
                                     return Promise.reject(new Error("请输入新前缀"));
                                 }
                                 if (!isValidFontName(value)) {
-                                    return Promise.reject(new Error("格式错误，例：icon-，icon_"));
+                                    return Promise.reject(new Error("格式错误，如：icon-"));
                                 }
                                 return Promise.resolve();
                             },
                         },
                     ]}
                 >
-                    <Input placeholder="请输入新前缀" />
+                    <Input placeholder="请输入新前缀，如：icon-" />
                 </Form.Item>
                 <Form.Item
                     label="旧前缀"
@@ -64,7 +65,7 @@ export const UpdatePrefixModal: React.FC<UpdatePrefixModalProps> = React.memo(({
                         },
                     ]}
                 >
-                    <Input placeholder="旧前缀将被新前缀替换" />
+                    <Input placeholder="旧前缀将替换为新前缀" />
                 </Form.Item>
             </Form>
         </Modal>
