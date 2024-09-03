@@ -12,13 +12,28 @@ import { generateIcon } from "./api/generateIcon";
 import { scanIcon, type FontUsage } from "./api/scanIcon";
 import { UploadModal } from "./components/UploadModal";
 import { AutoLoadingButton } from "./components/basic/AutoLoadingButton";
-import "./globals.css";
 import { UpdatePrefixModal } from "./components/UpdatePrefixModal";
+import { APIException } from "./utils/exception";
+import "./globals.css";
 
 dayjs.locale("zh-cn");
 
 const SvgIconGrid = lazy(() => import("./components/SvgIconGrid"));
 const FontIconGrid = lazy(() => import("./components/FontIconGrid"));
+
+window.addEventListener("unhandledrejection", event => {
+    if (event.reason instanceof APIException) {
+        event.preventDefault();
+        if (event.reason.message.length > 20) {
+            Modal.warning({
+                title: "提示",
+                content: event.reason.message,
+            });
+        } else {
+            message.error(event.reason.message);
+        }
+    }
+});
 
 const App = () => {
     const [{ font, component }, setData] = React.useState<FontData>({});
@@ -31,11 +46,7 @@ const App = () => {
     const fetchList = () => getIconList().then(res => setData(res));
 
     const rename = (oldName: string, newName: string) => {
-        renameIcon(oldName, newName)
-            .then(fetchList)
-            .catch(err => {
-                message.error(err.message);
-            });
+        renameIcon(oldName, newName).then(fetchList);
     };
 
     const remove = (name: string) => {
@@ -60,15 +71,7 @@ const App = () => {
         message.success("生成成功！");
     };
 
-    const scan = async () => {
-        return scanIcon()
-            .then(res => {
-                setUsage(res);
-            })
-            .catch(error => {
-                message.error(error.message);
-            });
-    };
+    const scan = async () => scanIcon().then(setUsage);
 
     useEffect(() => {
         fetchList();

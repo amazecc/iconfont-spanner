@@ -1,9 +1,8 @@
-export const removeIcon = async (name: string) => {
-    return fetch("/api/remove", {
+import { request } from "src/utils/request";
+
+export const removeIcon = (name: string): Promise<void> => {
+    return request("/api/remove", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json", // 设置请求头，指明请求体格式为 JSON
-        },
         body: JSON.stringify({ name }),
-    }).then(res => res.json());
+    });
 };

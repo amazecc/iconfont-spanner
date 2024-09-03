@@ -4,6 +4,7 @@ import Router from "@koa/router";
 import { FontManager } from "./utils/FontManager/index.js";
 import { getSvgFilePathByName, importConfig, renameFile } from "./utils/index.js";
 import { findRepeat, scanSvgFilePaths } from "./utils/FontManager/utils.js";
+import { ResponseBody, ResponseError } from "./api/response.js";
 
 const router = new Router();
 
@@ -11,20 +12,17 @@ router.get("/api/list", async ctx => {
     const config = await importConfig();
     const fontManager = new FontManager(config);
     fontManager.read();
-    ctx.body = {
-        success: true,
-        data: {
-            font: fontManager.font
-                ? {
-                      name: fontManager.font.option.name,
-                      metadata: fontManager.font.metadata,
-                  }
-                : undefined,
-            component: fontManager.component && {
-                metadata: fontManager.component.metadata,
-            },
+    ctx.body = new ResponseBody({
+        font: fontManager.font
+            ? {
+                  name: fontManager.font.option.name,
+                  metadata: fontManager.font.metadata,
+              }
+            : undefined,
+        component: fontManager.component && {
+            metadata: fontManager.component.metadata,
         },
-    };
+    });
 });
 
 router.post("/api/generate", async ctx => {
@@ -38,7 +36,7 @@ router.post("/api/generate", async ctx => {
         fs.removeSync(fontManager.component.getOutputPath());
     }
     fontManager.generate();
-    ctx.body = { success: true };
+    ctx.body = new ResponseBody(null);
 });
 
 router.post("/api/rename", async ctx => {
@@ -48,12 +46,12 @@ router.post("/api/rename", async ctx => {
         if (oldPath) {
             const newPath = oldPath.replace(`${oldName}.svg`, `${newName}.svg`);
             await renameFile(oldPath, newPath);
-            ctx.body = { success: true };
+            ctx.body = new ResponseBody(null);
         } else {
-            ctx.body = { success: false, message: "该原始文件不存在，请刷新页面获取最新组件列表" };
+            ctx.body = new ResponseError("该原始文件不存在，请刷新页面获取最新组件列表");
         }
     } else {
-        ctx.body = { success: false, message: "名称必须以字母开头，只能包含字母、数字、下划线和中划线" };
+        ctx.body = new ResponseError("名称必须以字母开头，只能包含字母、数字、下划线和中划线");
     }
 });
 
@@ -64,7 +62,7 @@ router.post("/api/remove", async ctx => {
         fs.removeSync(filePath);
         console.log(`[delete]: ${filePath}`);
     }
-    ctx.body = { success: true };
+    ctx.body = new ResponseBody(null);
 });
 
 type AddData = { name: string; svg: string }[];
@@ -76,14 +74,11 @@ router.post("/api/add", async ctx => {
     const repeatNames = findRepeat(data.map(item => item.name).concat(fileNames));
     const invalidNames = data.filter(item => !FontManager.isValidFileName(item.name));
     if (repeatNames.length > 0 || invalidNames.length > 0) {
-        ctx.body = {
-            success: true,
-            data: {
-                names: fileNames,
-                repeatNames,
-                invalidNames,
-            },
-        };
+        ctx.body = new ResponseBody({
+            names: fileNames,
+            repeatNames,
+            invalidNames,
+        });
     } else {
         const tasks = data.map(item => {
             const filePath = path.join(config.resourceDir, `${item.name}.svg`);
@@ -94,7 +89,7 @@ router.post("/api/add", async ctx => {
         });
         await Promise.all(tasks.map(item => item.task));
         console.log(`[add]: \n${tasks.map(item => item.filePath).join("\n")}`);
-        ctx.body = { success: true };
+        ctx.body = new ResponseBody(null);
     }
 });
 
@@ -122,21 +117,16 @@ router.get("/api/scan", async ctx => {
             return undefined;
         };
 
-        ctx.body = {
-            success: true,
-            data:
-                font || component
-                    ? {
-                          font: await getFontUsage(),
-                          component: await getSvgUsage(),
-                      }
-                    : null,
-        };
+        ctx.body = new ResponseBody(
+            font || component
+                ? {
+                      font: await getFontUsage(),
+                      component: await getSvgUsage(),
+                  }
+                : null,
+        );
     } else {
-        ctx.body = {
-            success: false,
-            message: "请配置扫描目录",
-        };
+        ctx.body = new ResponseError("请配置扫描目录");
     }
 });
 
@@ -171,7 +161,7 @@ router.post("/api/prefix", async ctx => {
     for (const { oldPath, newPath } of paths) {
         await renameFile(oldPath, newPath);
     }
-    ctx.status = 204;
+    ctx.body = new ResponseBody(null);
 });
 
 router.get("/api/ttf", async ctx => {
@@ -184,10 +174,7 @@ router.get("/api/ttf", async ctx => {
         ctx.set("Content-Disposition", `inline; filename="${fontManager.font.option.name ?? "font"}.ttf"`);
         ctx.set("Content-Type", "font/ttf");
     } else {
-        ctx.body = {
-            success: false,
-            message: "请配置 output.font",
-        };
+        ctx.body = new ResponseError("请配置 output.font");
     }
 });
 
@@ -201,10 +188,7 @@ router.get("/api/woff", async ctx => {
         ctx.set("Content-Disposition", `inline; filename="${fontManager.font.option.name ?? "font"}.woff"`);
         ctx.set("Content-Type", "font/woff");
     } else {
-        ctx.body = {
-            success: false,
-            message: "请配置字体",
-        };
+        ctx.body = new ResponseError("请配置字体");
     }
 });
 
@@ -218,10 +202,7 @@ router.get("/api/woff2", async ctx => {
         ctx.set("Content-Disposition", `inline; filename="${fontManager.font.option.name ?? "font"}.woff2"`);
         ctx.set("Content-Type", "font/woff2");
     } else {
-        ctx.body = {
-            success: false,
-            message: "请配置字体",
-        };
+        ctx.body = new ResponseError("请配置字体");
     }
 });
 

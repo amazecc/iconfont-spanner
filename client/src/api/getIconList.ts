@@ -1,5 +1,6 @@
 import type { SvgComponentMetadata } from "server/utils/FontManager/Component";
 import type { FontMetadata } from "server/utils/FontManager/Font";
+import { request } from "src/utils/request";
 
 export interface FontData {
     font?: {
@@ -11,8 +12,6 @@ export interface FontData {
     };
 }
 
-export const getIconList = async () => {
-    return fetch("/api/list")
-        .then(res => res.json())
-        .then(res => res.data as FontData);
+export const getIconList = (): Promise<FontData> => {
+    return request("/api/list", { method: "GET" });
 };

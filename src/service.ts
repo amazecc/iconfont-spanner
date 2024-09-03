@@ -6,18 +6,20 @@ import cors from "@koa/cors";
 import { bodyParser } from "@koa/bodyparser";
 import { router } from "./router.js";
 import { fileURLToPath } from "url";
+import { errorGuard } from "./middleware/errorGuard.js";
 
 const app = new Koa();
 
 const __FILENAME = fileURLToPath(import.meta.url);
 const __DIRNAME = path.dirname(__FILENAME);
 
-app.use(router.allowedMethods())
+app.use(errorGuard)
+    .use(router.allowedMethods())
     .use(bodyParser())
     .use(cors())
     .use(router.routes())
     .use(serve(path.resolve(__DIRNAME, "../static")))
-    .use(historyApiFallback);
+    .use(historyApiFallback());
 
 export const start = (port = 3000) => {
     const server = app.listen(port, () => {

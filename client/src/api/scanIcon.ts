@@ -1,3 +1,5 @@
+import { request } from "src/utils/request";
+
 export interface FontUsage {
     font?: {
         used: string[];
@@ -9,18 +11,8 @@ export interface FontUsage {
     };
 }
 
-export const scanIcon = async () => {
-    return fetch("/api/scan", {
+export const scanIcon = (): Promise<FontUsage> => {
+    return request("/api/scan", {
         method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-        },
-    })
-        .then(res => res.json())
-        .then(res => {
-            if (res.success) {
-                return res.data as FontUsage | null;
-            }
-            throw new Error(res.message);
-        });
+    });
 };

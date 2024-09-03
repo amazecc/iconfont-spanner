@@ -35,7 +35,7 @@ export class Scanner {
             filePaths.map(filePath =>
                 Scanner.readlinePromise(filePath, line => {
                     keywords.forEach(keyword => {
-                        const regex = new RegExp(`(?<!\\s*((\\/\\/|\\/\\*\\*|\\*|type\\s+\\w+\\s*=|\\w+\\s*:).+))${keyword}`);
+                        const regex = new RegExp(`(?<!\\s*((\\/\\/|\\/\\*\\*|\\*|type\\s+\\w+\\s*=|\\w+\\s*:|^\\.).*?))${keyword}`); // TODO: 联合类型的情况
                         if (regex.test(line)) {
                             usedSet.add(keyword);
                         }

@@ -24,6 +24,9 @@ const config: Configuration = merge(common, {
                 changeOrigin: true,
             },
         ],
+        client: {
+            overlay: false,
+        },
     },
     module: {
         rules: [
@@ -47,7 +50,9 @@ const config: Configuration = merge(common, {
         new DefinePlugin({
             IS_DEV: JSON.stringify(true),
         }),
-        new ReactRefreshWebpackPlugin(),
+        new ReactRefreshWebpackPlugin({
+            overlay: false,
+        }),
     ],
 });
 

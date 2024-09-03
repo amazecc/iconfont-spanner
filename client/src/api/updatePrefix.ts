@@ -1,9 +1,8 @@
-export const updatePrefix = async (newPrefix: string, oldPrefix?: string) => {
-    return fetch("/api/prefix", {
+import { request } from "src/utils/request";
+
+export const updatePrefix = (newPrefix: string, oldPrefix?: string): Promise<void> => {
+    return request("/api/prefix", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json", // 设置请求头，指明请求体格式为 JSON
-        },
         body: JSON.stringify({ newPrefix, oldPrefix }),
     });
 };
