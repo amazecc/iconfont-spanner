@@ -5,7 +5,7 @@ import { type FontUsage } from "../../api/scanIcon";
 import { FontStyle } from "./FontStyle";
 import { FontCard } from "../FontCard";
 import { message } from "antd";
-import type { UsageType } from "../UsageCheckboxGroup";
+import type { UsageType } from "../UsageRadio";
 
 export interface FontIconGridProps {
     metadata: FontMetadata[];

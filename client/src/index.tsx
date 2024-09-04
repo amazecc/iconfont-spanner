@@ -15,7 +15,7 @@ import { AutoLoadingButton } from "./components/basic/AutoLoadingButton";
 import { UpdatePrefixModal } from "./components/UpdatePrefixModal";
 import { APIException } from "./utils/exception";
 import { getInfo } from "./api/getInfo";
-import { UsageCheckboxGroup, type UsageType } from "./components/UsageCheckboxGroup";
+import { UsageRadio, type UsageType } from "./components/UsageRadio";
 import SvgIconGrid from "./components/SvgIconGrid";
 import FontIconGrid from "./components/FontIconGrid";
 import "./globals.css";
@@ -93,7 +93,7 @@ const App = () => {
                         <h1 className="text-2xl font-semibold leading-none text-slate-700">{title}</h1>
                         <div className="flex gap-4">
                             <div className="mr-8 inline-flex gap-4">
-                                <UsageCheckboxGroup value={usageType} onChange={setUsageType} />
+                                <UsageRadio value={usageType} onChange={setUsageType} />
                                 <Tooltip title="将扫描项目所有代码，比较耗时">
                                     <span>
                                         <AutoLoadingButton icon={<RadarChartOutlined />} danger type="primary" onClick={scan}>

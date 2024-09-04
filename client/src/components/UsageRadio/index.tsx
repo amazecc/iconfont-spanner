@@ -3,13 +3,13 @@ import classnames from "classnames";
 
 export type UsageType = "已使用" | "未使用" | "未扫描";
 
-export interface UsageCheckboxGroupProps {
+export interface UsageRadioProps {
     value?: UsageType;
     onChange?: (value?: UsageType) => void;
 }
 
-export const UsageCheckboxGroup: React.FC<UsageCheckboxGroupProps> = React.memo(({ value, onChange }) => {
-    const itemClass = (type: UsageType) => classnames("flex cursor-pointer items-center text-sm text-gray-700", value?.includes(type) && "font-bold text-blue-600");
+export const UsageRadio: React.FC<UsageRadioProps> = React.memo(({ value, onChange }) => {
+    const itemClass = (type: UsageType) => classnames("flex cursor-pointer items-center text-sm text-gray-700", value?.includes(type) && "font-bold !text-blue-600");
 
     return (
         <div className="inline-flex gap-4">
