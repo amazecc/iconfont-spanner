@@ -8,6 +8,13 @@ import { ResponseBody, ResponseError } from "./api/response.js";
 
 const router = new Router();
 
+router.get("/api/info", async ctx => {
+    const config = await importConfig();
+    ctx.body = new ResponseBody({
+        title: config.title ?? "Iconfont-Spanner",
+    });
+});
+
 router.get("/api/list", async ctx => {
     const config = await importConfig();
     const fontManager = new FontManager(config);

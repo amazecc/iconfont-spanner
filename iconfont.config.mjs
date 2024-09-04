@@ -10,8 +10,9 @@ const formatCode = (code, parser) => {
     return prettier.format(code, { ...JSON.parse(fs.readFileSync(path.resolve(_dirname, ".prettierrc"))).toString(), parser });
 };
 
-/** @type {import('./src/index.js').FontManagerOption} */
+/** @type {import('./src/index.js').Config} */
 export default {
+    title: "Iconfont Preview",
     resourceDir: "client/src/svg",
     output: {
         font: {

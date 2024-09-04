@@ -23,7 +23,7 @@ export const FontCard: React.FC<FontCardProps> = React.memo(props => {
     return (
         <div
             className={classnames(
-                "group relative box-border flex flex-col items-center justify-start rounded-md border border-dashed border-transparent px-1 py-6  transition-all hover:border-blue-600",
+                "group relative box-border flex flex-col items-center justify-start rounded-md border border-transparent px-1 py-6 shadow-slate-500 transition-all hover:border-slate-300 hover:shadow-2xl",
                 className,
             )}
             style={style}

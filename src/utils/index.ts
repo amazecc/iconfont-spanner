@@ -5,7 +5,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { exec } from "child_process";
 import { getPosixPath, scanSvgFilePaths } from "./FontManager/utils.js";
-import type { FontManagerOption } from "./FontManager/index.js";
+import type { Config } from "./type.js";
 
 /**
  * 导入根目录文件
@@ -15,7 +15,7 @@ import type { FontManagerOption } from "./FontManager/index.js";
 export const importRootFile = async (fileName: string) => import(pathToFileURL(getPosixPath(path.resolve(process.cwd(), fileName))).href);
 
 /** 导入配置项 */
-export const importConfig = async (): Promise<FontManagerOption> =>
+export const importConfig = async (): Promise<Config> =>
     importRootFile("iconfont.config.mjs")
         .catch(() => importRootFile("iconfont.config.js"))
         .then(config => config.default);

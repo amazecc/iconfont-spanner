@@ -1,7 +1,7 @@
-import React, { useEffect, Suspense, lazy } from "react";
+import React, { useEffect, Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import dayjs from "dayjs";
-import { Button, ConfigProvider, message, Modal, Tabs, Tooltip } from "antd";
+import { Button, ConfigProvider, message, Modal, notification, Tabs, Tooltip } from "antd";
 import { InfoCircleOutlined, PlusOutlined, RadarChartOutlined, RetweetOutlined, VerticalLeftOutlined } from "@ant-design/icons";
 import { useBoolean } from "ahooks";
 import zhCN from "antd/locale/zh_CN";
@@ -14,20 +14,22 @@ import { UploadModal } from "./components/UploadModal";
 import { AutoLoadingButton } from "./components/basic/AutoLoadingButton";
 import { UpdatePrefixModal } from "./components/UpdatePrefixModal";
 import { APIException } from "./utils/exception";
+import { getInfo } from "./api/getInfo";
+import { UsageCheckboxGroup, type UsageType } from "./components/UsageCheckboxGroup";
+import SvgIconGrid from "./components/SvgIconGrid";
+import FontIconGrid from "./components/FontIconGrid";
 import "./globals.css";
 
 dayjs.locale("zh-cn");
-
-const SvgIconGrid = lazy(() => import("./components/SvgIconGrid"));
-const FontIconGrid = lazy(() => import("./components/FontIconGrid"));
 
 window.addEventListener("unhandledrejection", event => {
     if (event.reason instanceof APIException) {
         event.preventDefault();
         if (event.reason.message.length > 20) {
-            Modal.warning({
-                title: "提示",
-                content: event.reason.message,
+            notification.warning({
+                message: "提示",
+                description: event.reason.message,
+                placement: "top",
             });
         } else {
             message.error(event.reason.message);
@@ -36,7 +38,9 @@ window.addEventListener("unhandledrejection", event => {
 });
 
 const App = () => {
+    const [title, setTitle] = React.useState<string>("");
     const [{ font, component }, setData] = React.useState<FontData>({});
+    const [usageType, setUsageType] = React.useState<UsageType | undefined>();
 
     const [usage, setUsage] = React.useState<FontUsage | null>(null);
 
@@ -75,12 +79,47 @@ const App = () => {
 
     useEffect(() => {
         fetchList();
+        getInfo().then(res => {
+            setTitle(res.title);
+            document.title = res.title;
+        });
     }, []);
 
     return (
         <ConfigProvider locale={zhCN}>
             <Suspense>
-                <div className="mx-auto max-w-screen-lg pb-11 pt-14">
+                <div className="fixed left-0 top-0 z-[1] w-full shadow backdrop-blur">
+                    <div className="mx-auto flex max-w-screen-xl items-center justify-between py-4">
+                        <h1 className="text-2xl font-semibold leading-none text-slate-700">{title}</h1>
+                        <div className="flex gap-4">
+                            <div className="mr-8 inline-flex gap-4">
+                                <UsageCheckboxGroup value={usageType} onChange={setUsageType} />
+                                <Tooltip title="将扫描项目所有代码，比较耗时">
+                                    <span>
+                                        <AutoLoadingButton icon={<RadarChartOutlined />} danger type="primary" onClick={scan}>
+                                            扫描
+                                        </AutoLoadingButton>
+                                    </span>
+                                </Tooltip>
+                            </div>
+                            <Button icon={<VerticalLeftOutlined />} type="primary" onClick={openPrefixModal}>
+                                设置前缀
+                            </Button>
+                            <Button icon={<PlusOutlined />} type="primary" onClick={setTrue}>
+                                添加
+                            </Button>
+                            <Tooltip title="每次编辑图标，都需要重新转化资源">
+                                <span>
+                                    <AutoLoadingButton icon={<RetweetOutlined />} type="primary" onClick={generate}>
+                                        转化
+                                    </AutoLoadingButton>
+                                </span>
+                            </Tooltip>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mx-auto max-w-screen-xl pb-11 pt-24">
                     <Tabs
                         type="card"
                         items={[
@@ -104,48 +143,14 @@ const App = () => {
                                     </span>
                                 ),
                                 key: "font",
-                                children: <FontIconGrid usage={usage?.font} metadata={font.metadata} onRemove={remove} onRename={rename} />,
+                                children: <FontIconGrid usage={usage?.font} usageType={usageType} metadata={font.metadata} onRemove={remove} onRename={rename} />,
                             },
                             !!component && {
                                 label: "SVG Component",
                                 key: "svg",
-                                children: <SvgIconGrid usage={usage?.component} metadata={component.metadata} onRemove={remove} onRename={rename} />,
+                                children: <SvgIconGrid usage={usage?.component} usageType={usageType} metadata={component.metadata} onRemove={remove} onRename={rename} />,
                             },
                         ].filter(item => item !== false)}
-                        tabBarExtraContent={{
-                            right: (
-                                <div className="flex gap-4">
-                                    <div className="inline-flex gap-3">
-                                        <span className="flex items-center text-xs text-gray-700">
-                                            <span className="mr-1 h-[1em] w-[1em] border border-gray-300 bg-slate-200" />
-                                            未使用
-                                        </span>
-                                        <span className="flex items-center text-xs text-gray-700">
-                                            <span className="mr-1 h-[1em] w-[1em] border border-gray-300 bg-green-200" />
-                                            已使用
-                                        </span>
-                                        <span className="flex items-center text-xs text-gray-700">
-                                            <span className="mr-1 h-[1em] w-[1em] border border-gray-300" />
-                                            未知
-                                        </span>
-                                        <AutoLoadingButton icon={<RadarChartOutlined />} type="primary" onClick={scan}>
-                                            扫描
-                                        </AutoLoadingButton>
-                                    </div>
-                                    <Button icon={<VerticalLeftOutlined />} type="primary" onClick={openPrefixModal}>
-                                        设置前缀
-                                    </Button>
-                                    <Button icon={<PlusOutlined />} type="primary" onClick={setTrue}>
-                                        添加
-                                    </Button>
-                                    <Tooltip title="每次编辑图标，都需要重新转化资源">
-                                        <AutoLoadingButton icon={<RetweetOutlined />} type="primary" onClick={generate}>
-                                            转化
-                                        </AutoLoadingButton>
-                                    </Tooltip>
-                                </div>
-                            ),
-                        }}
                     />
                     <UploadModal open={open} onClose={setFalse} onSuccess={fetchList} />
                     <UpdatePrefixModal
