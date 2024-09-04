@@ -1,6 +1,6 @@
 {
     "name": "iconfont-spanner",
-    "version": "2.5.2-beta.0",
+    "version": "2.5.2-beta.1",
     "description": "iconfont 本地管理服务",
     "type": "module",
     "bin": {
