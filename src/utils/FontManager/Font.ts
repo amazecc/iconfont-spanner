@@ -4,7 +4,7 @@ import SVGIcons2SVGFontStream, { type Metadata } from "svgicons2svgfont";
 import svg2ttf from "svg2ttf";
 import ttf2woff2 from "ttf2woff2";
 import ttf2woff from "ttf2woff";
-import { getTypeDeclarationString, getCssString, getAbsolutePath, getDefaultFontStyle } from "./utils.js";
+import { getTypeDeclarationString, getCssString, getAbsolutePath, getDefaultFontStyle, regex } from "./utils.js";
 
 export type FontType = "ttf" | "woff" | "woff2";
 
@@ -53,7 +53,7 @@ export class Font {
     /** 校验字体配置 */
     public static validate(option: FontOption) {
         const { name, types } = option;
-        if (!/^[a-zA-Z][\w-]*$/.test(name)) {
+        if (!regex.fontName.test(name)) {
             throw new Error("font.name 必须以字母开头，且只能包含字母、下划线和连字符");
         }
         if (types && types.length === 0) {

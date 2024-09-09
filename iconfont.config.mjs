@@ -25,7 +25,7 @@ export default {
             fileFullName: fileName => `${toBigCamelCase(fileName.replace(/_oc$/, "_OC"))}.tsx`,
             name: fileName => toBigCamelCase(fileName.replace(/_oc$/, "_OC")),
             content: (...args) => formatCode(getSvgTSReactComponentContent(...args), "typescript"),
-            fillCurrentColor: fileName => !fileName.endsWith("_oc"),
+            clearColor: fileName => !fileName.endsWith("_oc"),
         },
     },
     scan: {

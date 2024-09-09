@@ -1,5 +1,5 @@
 import path from "path";
-import { findRepeat, scanSvgFilePaths, getAbsolutePath } from "./utils.js";
+import { findRepeat, scanSvgFilePaths, getAbsolutePath, regex } from "./utils.js";
 import { Font, type FontOption } from "./Font.js";
 import { Component, type ComponentOption } from "./Component.js";
 import { Scanner, type ScanOption } from "./Scanner.js";
@@ -23,7 +23,7 @@ export interface FontManagerOption {
 export class FontManager {
     /** 校验 svg 字体名（文件名称） */
     public static isValidFileName(name: string) {
-        return /^[a-zA-Z][a-zA-Z-_\d]+$/.test(name);
+        return regex.fileName.test(name);
     }
 
     /** 检查目录下的重复文件名 */

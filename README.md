@@ -86,8 +86,8 @@ export default {
             name: fileName => toBigCamelCase(fileName),
             // 组件内容
             content: getSvgTSReactComponentContent,
-            // 是否使用 currentColor 填充 svg fill 属性，如果不填充，则保留原色，可以用来实现彩色图标
-            fillCurrentColor: fileName => !fileName.endsWith("_oc"),
+            // 是否清除颜色，清除后，可通过字体颜色控制色彩
+            clearColor: fileName => !fileName.endsWith("_oc"),
         },
     },
     // 扫描引用情况

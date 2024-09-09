@@ -1,7 +1,7 @@
 import readline from "readline";
 import fs from "fs";
 import { glob } from "glob";
-import { getAbsolutePath } from "./utils.js";
+import { getAbsolutePath, regex } from "./utils.js";
 import path from "path";
 
 /** 文件扫描文件夹配置 */
@@ -35,8 +35,7 @@ export class Scanner {
             filePaths.map(filePath =>
                 Scanner.readlinePromise(filePath, line => {
                     keywords.forEach(keyword => {
-                        const regex = new RegExp(`(?<!\\s*((\\/\\/|\\/\\*\\*|\\*|type\\s+\\w+\\s*=|\\w+\\s*:|^\\.).*?))${keyword}`); // TODO: 联合类型的情况
-                        if (regex.test(line)) {
+                        if (regex.usageKeyword(keyword).test(line)) {
                             usedSet.add(keyword);
                         }
                     });

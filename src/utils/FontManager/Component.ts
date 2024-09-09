@@ -12,10 +12,10 @@ export interface ComponentOption {
     /** 组件代码 */
     content: (name: string, svgString: string, fileName: string) => string | Promise<string>;
     /**
-     * 是否使用 currentColor 填充颜色，这将继承 fontColor
+     * 是否将 svg 的所有颜色都清除掉，清除后可使用字体颜色控制该 svg 颜色
      * @default true
      */
-    fillCurrentColor?: boolean | ((fileName: string) => boolean);
+    clearColor?: boolean | ((fileName: string) => boolean);
 }
 
 /** 需要生成 svg 组件的信息 */
@@ -28,8 +28,8 @@ export interface SvgComponentMetadata {
     name: string;
     /** svg 优化后的字符 */
     svgOptimizeString: string;
-    /** 是否使用 currentColor 填充 */
-    fillCurrentColor: boolean;
+    /** 是否清除颜色，即使用 currentColor 替换所有颜色 */
+    clearColor: boolean;
 }
 
 export class Component {
@@ -40,7 +40,7 @@ export class Component {
 
     constructor(option: ComponentOption) {
         this.option = {
-            fillCurrentColor: true,
+            clearColor: true,
             ...option,
             dir: getAbsolutePath(option.dir),
         };
@@ -74,17 +74,17 @@ export class Component {
      * @param filePath svg 路径
      */
     public add(filePath: string) {
-        const { name, fillCurrentColor } = this.option;
+        const { name, clearColor } = this.option;
         const fileName = path.basename(filePath, ".svg");
-        const fillCurrentColorValue = fillCurrentColor instanceof Function ? fillCurrentColor(fileName) : (fillCurrentColor ?? true);
+        const clearColorValue = clearColor instanceof Function ? clearColor(fileName) : clearColor;
         const svg = fs.readFileSync(filePath, "utf-8");
-        const svgOptimizeString = optimizeSvgString(svg, fillCurrentColorValue);
+        const svgOptimizeString = optimizeSvgString(svg, clearColorValue);
         this.metadata.push({
             filePath,
             fileName,
             name: name(fileName),
             svgOptimizeString,
-            fillCurrentColor: fillCurrentColorValue,
+            clearColor: clearColorValue,
         });
     }
 

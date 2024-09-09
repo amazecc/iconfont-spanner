@@ -4,6 +4,21 @@ import { globSync } from "glob";
 import type { FontMetadata, FontType } from "./Font.js";
 import type { ComponentOption } from "./Component.js";
 
+// ********************************************** 正则 *******************************************************
+
+/** 正则集合 */
+export const regex = {
+    /** 字体名称 */
+    fontName: /^[a-zA-Z][\w-]*$/,
+    /** svg 文件名称 */
+    fileName: /^[a-zA-Z][a-zA-Z-_\d]+$/,
+    /** web 颜色 */
+    colorString:
+        /#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\b|rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)|rgba\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(0|0?\.\d+|1(\.0)?)\s*\)|hsl\(\s*(\d{1,3})\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*\)|hsla\(\s*(\d{1,3})\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*,\s*(0|0?\.\d+|1(\.0)?)\s*\)/i,
+    /** 已使用的关键词 */
+    usageKeyword: (keyword: string) => new RegExp(`(?<!\\s*((\\/\\/|\\/\\*\\*|\\*|type\\s+\\w+\\s*=|\\w+\\s*:|^\\.).*?))${keyword}`), // TODO: 如果没有排除掉 输出目录，则全部都是未使用或者已使用，需要检查下
+};
+
 // ********************************************** node 工具函数 ***********************************************
 
 /**
@@ -41,9 +56,10 @@ export const getAbsolutePath = (filePath: string) => {
 /**
  * 优化 svg 代码，修改 fill 与宽高等
  * @param svg svg 文件字符
+ * @param clearColor 是否清楚颜色，将使用 currentColor 替换
  * @returns 优化后的 svg 字符
  */
-export const optimizeSvgString = (svg: string, fillCurrentColor: boolean) => {
+export const optimizeSvgString = (svg: string, clearColor: boolean) => {
     const { data } = optimize(svg, {
         plugins: [
             {
@@ -68,9 +84,12 @@ export const optimizeSvgString = (svg: string, fillCurrentColor: boolean) => {
                                     // eslint-disable-next-line no-param-reassign
                                     delete node.attributes.class;
                                 }
-                                if (node.name === "path" && fillCurrentColor) {
-                                    // eslint-disable-next-line no-param-reassign
-                                    node.attributes.fill = "currentColor";
+                                if (clearColor) {
+                                    Object.entries(node.attributes)
+                                        .filter(([, value]) => regex.colorString.test(value))
+                                        .forEach(([key]) => {
+                                            node.attributes[key] = "currentColor";
+                                        });
                                 }
                             },
                         },
