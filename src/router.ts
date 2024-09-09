@@ -105,8 +105,8 @@ router.get("/api/scan", async ctx => {
 
     const fontManager = new FontManager(config);
     const { scanner, font, component } = fontManager;
-    fontManager.read();
     if (scanner) {
+        fontManager.read();
         const getFontUsage = () => {
             if (font) {
                 return scanner.scanUsage(font.metadata.map(metadata => metadata.fileName));
