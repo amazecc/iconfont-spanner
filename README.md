@@ -18,7 +18,7 @@ npm i -D iconfont-spanner
 
 ```sh
 # 终端转化
-npx iconfont
+npx iconfont # 别名 npx icon，别名可以在 iconfont 与其他包冲突的时候使用
 # 启动服务，网页操作，包括增删改查，查询使用情况，转化等功能
 npx iconfont start [--port 8080]
 ```
